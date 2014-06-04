@@ -5,6 +5,6 @@ qh_string.o:qh_string.cpp qh_string.h
 main.o:main.cpp qh_string.h
 	g++ -c main.cpp
 clean:
-	rm main.o qh_string.o main
+	rm *.o main
 install:
 	mv *.o ../extern/
