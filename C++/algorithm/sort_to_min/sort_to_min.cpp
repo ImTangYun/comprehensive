@@ -40,6 +40,10 @@ int compare(char* str1, char* str2)
 	if (tmp1 > tmp2) return 1;
 	return -1;
 }
+qsort(int num, int front, int end, p* str)
+{
+
+}
 
 void sort(int *num, int length)
 {
@@ -50,6 +54,7 @@ void sort(int *num, int length)
 		num_to_str(num[i], str[i], 12);
 	}
 
+	qsort(num, 0, length - 1, str);
 	for (int i = 0; i < length; ++i) {
 		delete [] str[i];
 	}
