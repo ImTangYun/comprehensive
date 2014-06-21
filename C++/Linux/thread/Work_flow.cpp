@@ -1,6 +1,7 @@
 // yuntang
 // file:work_flow.cpp
 #include <unistd.h>
+#include <stdio.h>
 #include "Work_flow.h"
 namespace cthread
 {
@@ -26,5 +27,9 @@ void WorkFlow::Run(CThread* thread, void* args)
 		Process(*which_thread);
 		sleep(1);
 	}
+}
+void WorkFlow::Process(int which_thread)
+{
+	printf("this is thread %d of WorkFlow\n", which_thread);
 }
 } // namespace cthread

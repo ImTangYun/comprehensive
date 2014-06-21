@@ -9,7 +9,7 @@ INSTALL := cp -p
 
 MAIN := main
 
-OBJS := main.o Cthread.o Work_flow.o process.o
+OBJS := main.o Cthread.o Work_flow.o process.o 
 all: $(MAIN) 
 
 %.o:%.cpp

@@ -7,7 +7,7 @@ namespace cthread
 class WorkFlow : public Runnuble
 {
 public:
-	WorkFlow();
+	WorkFlow(){thread_num_ = 0;}
 	virtual ~WorkFlow(){}
 	bool Init(int thread_num);
 	virtual void Process(int which_thread);

@@ -7,7 +7,7 @@ class CThread;
 class Runnuble
 {
 public:
-	Runnuble();
+	virtual ~Runnuble(){}
 	virtual void Run(CThread* cthread, void* args) = 0;
 };
 class CThread
