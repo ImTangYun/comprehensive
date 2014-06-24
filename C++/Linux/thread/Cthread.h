@@ -18,6 +18,7 @@ public:
 	Runnuble* runnuble(){return runnuble_;}
 	void* args(){return args_;}
 	static void* Hook(void* args);
+	void Join();
 private:
 	Runnuble* runnuble_;
 	void* args_;

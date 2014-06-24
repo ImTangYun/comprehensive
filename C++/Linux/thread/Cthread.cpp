@@ -23,5 +23,9 @@ void* CThread::Hook(void* args)
 	}
 	return (void*)NULL;
 }
+void CThread::Join()
+{
+	pthread_join(tid_, NULL);	
+}
 } // namespace cthread
 

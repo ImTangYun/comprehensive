@@ -8,7 +8,7 @@ class WorkFlow : public Runnuble
 {
 public:
 	WorkFlow(){thread_num_ = 0;}
-	virtual ~WorkFlow(){}
+	virtual ~WorkFlow();
 	bool Init(int thread_num);
 	virtual void Process(int which_thread);
 	virtual void Run(CThread* thread, void* args);
@@ -17,6 +17,7 @@ public:
 private:
 	std::map<int, CThread*> thread_;
 	int thread_num_;
+	bool running_;
 };
 }
 
