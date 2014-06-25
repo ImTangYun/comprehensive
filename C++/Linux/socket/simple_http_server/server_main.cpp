@@ -210,7 +210,8 @@
      负责真正发送文件 如*.html *.jpg等 
     *************************************/  
     void send_file(char* arguments, int sock)  
-    {  
+    { 
+		// char arguments[100];
         char* extension = file_type(arguments); // 获得文件后缀名  
         //char* content_type = "text/plain";        // 初始化type='text/plain'  
         char content_type[100];
@@ -222,13 +223,28 @@
         char *szTmp = NULL;  
         int tmp_len = 0;  
         static char num = 0;  
-      
+		bool is_php = false;
         printf("send_file\n");  
+		snprintf(content_type, sizeof(content_type), "application/x-gzip");
         if (strcmp(extension, "html") == 0)     // 发送内容为html  
         {  
             // content_type = "text/html";  
 			snprintf(content_type, sizeof(content_type), "text/html");  
-        }  
+        }
+
+        if (strcmp(extension, "php") == 0)     // 发送内容为html  
+        {  
+			is_php = true;
+			printf("php file\n");
+            // content_type = "text/html"; 
+			char buff_[100];
+			snprintf(buff_, sizeof(buff_), "php %s > %s.tmp", arguments, arguments);
+			system(buff_);
+			snprintf(buff_, sizeof(buff_), "%s.tmp", arguments);
+			snprintf(arguments, BUFSIZ, "%s", buff_);
+			printf("=====%s====", arguments);
+			snprintf(content_type, sizeof(content_type), "text/html");  
+		}
       
         if (strcmp(extension, "gif") == 0)      // 发送内容为gif  
         {  
@@ -302,7 +318,12 @@
             {  
                 num++;  
             }  
-        }  
+        }
+		if (is_php) {
+			char b[100];
+			snprintf(b, sizeof(b), "rm %s", arguments);
+			system(b);
+		}
     }  
       
     /*********************************** 
