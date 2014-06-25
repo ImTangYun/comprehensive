@@ -12,11 +12,11 @@ int main()
 	sleep(1);
 	Processor x;
 	x.Init(2);
-	//x.Init(5);
 	x.Start();
 	sleep(10);
 	x.Stop();
-	sleep(100);
+	work.Stop();
+	sleep(5);
     return 0;
 }
 
