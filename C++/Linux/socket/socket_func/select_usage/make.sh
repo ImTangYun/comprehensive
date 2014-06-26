@@ -1,2 +1,2 @@
 #!/bin/sh
-g++ select_server.cpp -lpthread
+g++ block.cpp -lpthread
