@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <assert.h>
 #include "taskqueue.h"
 using myspace::TaskNode;
 using myspace::TaskQueue;
@@ -41,11 +42,13 @@ int main()
     }
     pthread_t pid1;
     pthread_create(&pid1, NULL, pfunc_generate_task, NULL);
+    assert(pid1 > 0);
     pthread_t pid2;
     pthread_create(&pid2, NULL, pfunc_process_task, NULL);
-    while (!q.Empty()) {
-        printf("%s", (char*)q.Pop().data_);
-    }
+    assert(pid2 > 0);
+    pthread_t pid3;
+    pthread_create(&pid3, NULL, pfunc_process_task, NULL);
+    assert(pid3 > 0);
     while (true);
     return 0;
 }
