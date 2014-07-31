@@ -34,12 +34,11 @@ public:
         comp[s[0]] = 0;
         while (index < s.length()) {
             unordered_map<char, int>::iterator iter = comp.find(s[index]);
-            if (iter == comp.end()) {
-                comp[s[index]] = index;
-            } else {
-                front = iter->second + 1;
-                comp.erase(iter);
+            if (iter != comp.end()) {
+                if (front <= iter->second)
+                    front = iter->second + 1;
             }
+            comp[s[index]] = index;
             int length = index - front + 1;
             max = (max > length)?max:length;
             ++index;
