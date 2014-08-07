@@ -5,7 +5,7 @@
 #include "taskqueue.h"
 using myspace::TaskNode;
 using myspace::TaskQueue;
-TaskQueue q;
+TaskQueue<TaskNode> q;
 int i = 0;
 void* pfunc_generate_task(void* arg)
 {

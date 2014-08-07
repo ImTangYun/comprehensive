@@ -10,13 +10,13 @@ INSTALL := cp -p
 
 MAIN := main
 
-OBJS := main.o taskqueue.o
+OBJS := main.o 
 all: $(MAIN)
 
 %.o:%.cpp
 	$(CC) $(CPPFLAGS) $(addprefix -D,$(USER_MARCOS)) $(addprefix -I,$(INCS))  -c $< -o $@
 
-$(MAIN): main.o taskqueue.o $(LIB)
+$(MAIN): main.o  $(LIB)
 
 
 clean:
