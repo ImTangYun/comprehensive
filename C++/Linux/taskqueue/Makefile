@@ -1,7 +1,6 @@
 PREFIX := ../
 LIB :=  -lpthread
 INCS := $(PREFIX)extern_include
-USER_MARCOS := #_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE
 
 CPPFLAGS := -Wall -Werror -g -fPIC -std=c++11
 CC = g++
