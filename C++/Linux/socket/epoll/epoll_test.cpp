@@ -94,6 +94,7 @@ int32_t main()
 	}
 
 	close(listenfd);
+	close(efd);
 	return 0;
 }
 

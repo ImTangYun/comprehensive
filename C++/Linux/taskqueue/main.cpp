@@ -5,7 +5,7 @@
 #include "taskqueue.h"
 using myspace::TaskNode;
 using myspace::TaskQueue;
-TaskQueue<TaskNode> q;
+TaskQueue<TaskNode> q(100);
 int i = 0;
 void* pfunc_generate_task(void* arg)
 {
@@ -18,7 +18,7 @@ void* pfunc_generate_task(void* arg)
         tmp.length_ = 100;
         q.Push(tmp);
         printf("pushed: %d\n", i);
-        sleep(1);
+        usleep(1);
     } 
     return (void*)NULL;
 }
@@ -26,7 +26,7 @@ void* pfunc_process_task(void* arg)
 {
     while (true) {
         printf("poped: %s", (char*)q.Pop().data_);
-        sleep(2);
+        usleep(200000);
     } 
     return (void*)NULL;
 }
