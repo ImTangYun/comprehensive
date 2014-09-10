@@ -9,6 +9,7 @@ class AutoPtr
 {
 public:
     AutoPtr(T* p );
+    ~AutoPtr();
     AutoPtr(const AutoPtr& A);
     AutoPtr &operator=(const AutoPtr &A);
     T* operator->();
@@ -27,8 +28,14 @@ AutoPtr<T>::AutoPtr(T* p):data_ptr_(p)
 }
 
 template<typename T>
+AutoPtr<T>::~AutoPtr()
+{
+    Decref();
+}
+template<typename T>
 AutoPtr<T>::AutoPtr(const AutoPtr& A)
 {
+    ++*A->count_;
     Decref();
     data_ptr_ = A.data_ptr_;
     count_ = A.count_;
@@ -37,6 +44,7 @@ AutoPtr<T>::AutoPtr(const AutoPtr& A)
 template<typename T>
 AutoPtr<T> &AutoPtr<T>::operator=(const AutoPtr &A)
 {
+    ++*A->count_;
     Decref();
     data_ptr_ = A.data_ptr_;
     count_ = A.count_;
