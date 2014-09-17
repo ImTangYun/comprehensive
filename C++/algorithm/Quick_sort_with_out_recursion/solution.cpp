@@ -18,11 +18,11 @@ void partition(T* arr, int front, int end, queue<int> &help_q)
     int p2 = front;
     while (p2 <= end) {
         if (arr[front] > arr[p2]) {
-            swap<T>(arr[++p1], arr[p2]);
+            ::swap<T>(arr[++p1], arr[p2]);
         }
         ++p2;
     }
-    swap<T>(arr[front], arr[p1]);
+    ::swap<T>(arr[front], arr[p1]);
     help_q.push(front);
     help_q.push(p1);
     help_q.push(front + 1);
@@ -42,7 +42,6 @@ void quick_sort(T* arr, int length)
         int end = help_q.front();
         help_q.pop();
         partition<T>(arr, front, end, help_q);
-        printf("%d %d\n", front, end);
     }
 }
 void print(int a[], int length)
