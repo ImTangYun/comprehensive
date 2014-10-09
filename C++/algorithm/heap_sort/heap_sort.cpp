@@ -18,17 +18,17 @@ void Print_heap(int A[], int heap_size)
     }
 }
 
-int left(int i)
+inline int left(int i)
 {
     return 2 * i + 1;
 }
 
-int right(int i)
+inline int right(int i)
 {
     return 2 * i + 2;
 }
 
-void swap_(int &x, int &y)
+inline void swap_(int &x, int &y)
 {
     int tmp = x;
     x = y;
