@@ -18,6 +18,9 @@ public:
     void clear() { size_ = 0; end_ = data_;}
     iterator begin() {return begin_;}
     iterator end() {return end_; }
+    void reserve(const T cap);
+protected:
+    void realloc();
 private:
     uint32_t capacity_;
     T* data_;
@@ -26,6 +29,18 @@ private:
     uint32_t size_;
 };
 
+template<typename T>
+void vector<T>::realloc()
+{
+    T* p = data_;
+    data_ = new T[capacity_];
+    for (int i = 0; i < size_; ++i) {
+        data_[i] = p[i];
+    }
+    begin_ = data_;
+    end = data_ + size_;
+    delete [] p;
+}
 template<typename T>
 vector<T>::vector():capacity_(10), data_(new T[capacity_]),
     begin_(data_), end_(data_), size_(0)
@@ -46,15 +61,7 @@ template<typename T>
 void vector<T>::push_back(const T &v)
 {
     if (size_ == capacity_) {
-        T* p = data_;
         capacity_ *= 2;
-        data_ = new T[capacity_];
-        begin_ = data_;
-        end_ = data_ + size_;
-        for (int i = 0; i < size_; ++i) {
-            data_[i] = p[i];
-        }
-        delete [] p;
     }
     data_[size_] = v;
     ++end_;
@@ -64,15 +71,18 @@ template<typename T>
 void vector<T>::resize(const T &s)
 {
     if (capacity_ <= 2 * s) {
-        T* p = data_;
-        capacity_ *= 2;
-        data_ = new T[capacity_];
-        for (int i = 0; i < size_; ++i) {
-            data_[i] = p[i];
-        }
-        delete [] p;
+        capacity_ = 2 * s;
+        realloc();
     }
     size_ = s;
     end_ = data_ + size_;
+}
+template<typename T>
+void vector<T>::reserve(const T cap)
+{
+    if (cap > capacity_) {
+        capacity_ = cap;
+        realloc();
+    }
 }
 #endif // VECTOR_H_
