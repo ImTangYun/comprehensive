@@ -1,5 +1,5 @@
-#ifndef VECTOR_H_
-#define VECTOR_H_
+#ifndef VECTOR_HPP_
+#define VECTOR_HPP_
 
 #include <assert.h>
 #include <stdint.h>
@@ -85,4 +85,4 @@ void vector<T>::reserve(const T cap)
         realloc();
     }
 }
-#endif // VECTOR_H_
+#endif // VECTOR_HPP_
