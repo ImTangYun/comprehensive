@@ -11,6 +11,7 @@ public:
     ~vector();
     typedef T* iterator;
     void push_back(const T &v);
+    void pop_back();
     T operator[](uint32_t i);
     uint32_t size() {return size_;}
     void resize(const T &s);
@@ -38,7 +39,7 @@ void vector<T>::realloc()
         data_[i] = p[i];
     }
     begin_ = data_;
-    end = data_ + size_;
+    end_ = data_ + size_;
     delete [] p;
 }
 template<typename T>
@@ -62,6 +63,7 @@ void vector<T>::push_back(const T &v)
 {
     if (size_ == capacity_) {
         capacity_ *= 2;
+        realloc();
     }
     data_[size_] = v;
     ++end_;
@@ -83,6 +85,18 @@ void vector<T>::reserve(const T cap)
     if (cap > capacity_) {
         capacity_ = cap;
         realloc();
+    }
+}
+template<typename T>
+void vector<T>::pop_back()
+{
+    if (size_ > 0) {
+        --size_;
+        --end_;
+        if (size_ * 3 < capacity_ && capacity_ > 10) {
+            capacity_ /= 2;
+            realloc();
+        }
     }
 }
 #endif // VECTOR_HPP_
