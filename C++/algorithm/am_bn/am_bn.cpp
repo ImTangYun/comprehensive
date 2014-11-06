@@ -14,13 +14,13 @@
 
 using std::vector;
 
-int max(int x, int y)
+inline int max(int x, int y)
 {
     if (x > y) return x;
     return y;
 }
 
-int min(int x, int y)
+inline int min(int x, int y)
 {
     if (x > y) return y;
     return x;
