@@ -59,6 +59,10 @@ int x(int m, int n)
 
 int main(int args, char** argv)
 {
+    if (args != 3) {
+        printf("Usage: %s num1 num2\n", argv[0]);
+        exit(0);
+    }
     printf("%d\n", x(atoi(argv[1]), atoi(argv[2])));
     return 0;
 }
