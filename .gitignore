@@ -1,3 +1,7 @@
 *.o
 *.so
 *.a
+.settings
+bin
+.classpath
+.project
