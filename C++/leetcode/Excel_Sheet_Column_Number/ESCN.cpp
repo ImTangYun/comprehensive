@@ -1,3 +1,4 @@
+// 其实就是进制转换，26进制转换成10进制
 class Solution {
 public:
     int titleToNumber(string s) {
