@@ -10,9 +10,12 @@ int32_t main(int argc, char** argv)
         MetaNode metanode(i, (int64_t)i * 10, 10);
         (*meta_datas)[i] = metanode;
     }
+    printf("meta data: %s\n", client.to_string().c_str());
     client.save_metadata();
-    // client.init();
-    printf("hello test");
+    Client client1;
+    client1.init();
+    printf("meta data: %s\n", client1.to_string().c_str());
+    printf("hello test\n");
     return 0;
 }
 

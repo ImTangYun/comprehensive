@@ -2,8 +2,10 @@
 #define _CLIENT_H_
 #include <stdint.h>
 #include <unordered_map>
+#include <string>
 
 using std::unordered_map;
+using std::string;
 struct MetaNode
 {
     uint64_t _file_id;
@@ -38,6 +40,22 @@ class Client
         unordered_map<uint64_t, MetaNode>* get_meta_datas()
         {
             return meta_datas;
+        }
+
+        string to_string()
+        {
+            string ret;
+            ret += "{";
+            char buffer[100];
+            unordered_map<uint64_t, MetaNode>::iterator iter = meta_datas->begin();
+            for (; iter != meta_datas->end(); ++iter) {
+                snprintf(buffer, 100, "file_id:%d|start:%d|length:%d,",
+                        (int32_t)iter->second._file_id,
+                        (int32_t)iter->second._start, (int32_t)iter->second._length);
+                ret += buffer;
+            }
+            ret += "}";
+            return ret;
         }
 
     private:
