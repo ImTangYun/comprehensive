@@ -9,3 +9,6 @@ aclocal.m4
 config.status
 configure
 Makefile
+Makefile.in
+*.dat
+*.idx
