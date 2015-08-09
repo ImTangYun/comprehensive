@@ -1,0 +1,11 @@
+autom4*
+missing
+depcomp
+install-sh
+main
+*.log
+/.deps/
+aclocal.m4
+config.status
+configure
+Makefile
