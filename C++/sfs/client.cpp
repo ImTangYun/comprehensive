@@ -2,6 +2,7 @@
 #include<unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unordered_map>
@@ -20,9 +21,19 @@ int32_t Client::init()
     int32_t size;
     MetaNode meta_node;
     ::read(fd, &size, sizeof(size));
+    int64_t max_file_id = -1;
     for (int32_t j = 0; j < size; ++j) {
         ::read(fd, &meta_node, sizeof(meta_node));
         (*meta_datas)[meta_node._file_id] = meta_node;
+        if (max_file_id < meta_node._file_id) {
+            max_file_id = meta_node._file_id;
+        }
+    }
+    if (max_file_id = -1) {
+        MetaNode meta_node(0, 0, 0);
+        latest_data = meta_node;
+    } else {
+        latest_data = meta_datas->find(max_file_id)->second;
     }
     printf("file num is: %d\n", size);
     return 0;
@@ -30,19 +41,36 @@ int32_t Client::init()
 
 int32_t Client::write(char* buffer, int64_t length)
 {
-
+    FILE* fp = fopen(DATA_STORAGE, "wr");
+    int64_t new_offset = latest_data._start + latest_data._length;
+    int32_t ret = fseek(fp, new_offset, SEEK_SET);
+    ret = fwrite(buffer, length, 1, fp);
+    int64_t file_id = latest_data._file_id + 1;
+    MetaNode meta_node(file_id, new_offset, length);
+    latest_data = meta_node;
     return 0;
 }
 
 int32_t Client::get_length(uint64_t file_id)
 {
-
-    return 0;
+    unordered_map<uint64_t, MetaNode>::iterator iter
+         = meta_datas->find(file_id);
+    if (iter != meta_datas->end()) {
+        return (iter->second)._length;
+    }
+    return -1;
 }
 
 int32_t Client::read(uint64_t file_id, char* buffer, int64_t &length)
 {
-
+    
+    FILE* fp = fopen(DATA_STORAGE, "wr");
+    unordered_map<uint64_t, MetaNode>::iterator iter = meta_datas->find(file_id);
+    if (iter == meta_datas->end()) {
+        return -1;
+    }
+    int32_t ret = fseek(fp, (iter->second)._start, SEEK_SET);
+    ret = fwrite(buffer, length, 1, fp);
     return 0;
 }
 int32_t Client::save_metadata()
@@ -59,4 +87,3 @@ int32_t Client::save_metadata()
     ::close(fd);
     return 0;
 }
-
