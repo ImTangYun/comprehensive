@@ -29,6 +29,7 @@ int32_t Client::init()
             max_file_id = meta_node._file_id;
         }
     }
+    close(fd);
     if (max_file_id = -1) {
         MetaNode meta_node(0, 0, 0);
         latest_data = meta_node;
@@ -48,6 +49,7 @@ int32_t Client::write(char* buffer, int64_t length)
     int64_t file_id = latest_data._file_id + 1;
     MetaNode meta_node(file_id, new_offset, length);
     latest_data = meta_node;
+    fclose(fp);
     return 0;
 }
 
@@ -71,6 +73,7 @@ int32_t Client::read(uint64_t file_id, char* buffer, int64_t &length)
     }
     int32_t ret = fseek(fp, (iter->second)._start, SEEK_SET);
     ret = fwrite(buffer, length, 1, fp);
+    fclose(fp);
     return 0;
 }
 int32_t Client::save_metadata()
