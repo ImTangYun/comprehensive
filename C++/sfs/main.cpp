@@ -20,16 +20,26 @@ void test_init_save()
     printf("hello test\n");
 }
 
+void write(char* buf, int64_t length, Client &client)
+{
+    uint64_t file_id = client.write(buf, length);
+}
+
 int32_t main(int argc, char** argv)
 {
     Client client;
     char data[] = "hello this is my data";
     uint64_t file_id = client.write(data, strlen(data));
-    int64_t file_length = client.get_length(file_id);
+    char buff[100];
+    for (int i = 0; i < 100; ++i) {
+        int length = snprintf(buff, length, "this is the %dth data", i);
+        write(buff, length, client);
+    }
+    int64_t file_length = client.get_length(27);
     char *buf = new char[file_length + 1];
-    int64_t ret = client.read(file_id, buf, file_length);
+    int64_t ret = client.read(27, buf, file_length);
     buf[file_length] = '\0';
-    printf("file_id:%d,file_length:%d, %s\n", (int32_t)file_id,
+    printf("file_id:%d,file_length:%d, data:%s\n", (int32_t)27,
             (int32_t)file_length, buf);
     return 0;
 }
