@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include "client.h"
 
-int32_t main(int argc, char** argv)
+
+void test_init_save()
 {
     Client client;
     unordered_map<uint64_t, MetaNode>* meta_datas = client.get_meta_datas();
@@ -16,6 +18,14 @@ int32_t main(int argc, char** argv)
     client1.init();
     printf("meta data: %s\n", client1.to_string().c_str());
     printf("hello test\n");
+}
+
+int32_t main(int argc, char** argv)
+{
+    Client client;
+    char data[] = "hello this is my data";
+    uint64_t file_id = client.write(data, strlen(data));
+    int64_t file_length = client.get_length(file_id);
     return 0;
 }
 

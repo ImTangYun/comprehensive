@@ -53,7 +53,7 @@ int32_t Client::write(char* buffer, int64_t length)
     return 0;
 }
 
-int32_t Client::get_length(uint64_t file_id)
+int64_t Client::get_length(uint64_t file_id)
 {
     unordered_map<uint64_t, MetaNode>::iterator iter
          = meta_datas->find(file_id);
@@ -63,7 +63,7 @@ int32_t Client::get_length(uint64_t file_id)
     return -1;
 }
 
-int32_t Client::read(uint64_t file_id, char* buffer, int64_t &length)
+int64_t Client::read(uint64_t file_id, char* buffer, int64_t &length)
 {
     
     FILE* fp = fopen(DATA_STORAGE, "wr");

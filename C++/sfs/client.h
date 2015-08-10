@@ -31,7 +31,7 @@ class Client
 
         int32_t write(char* buffer, int64_t length);
 
-        int32_t get_length(uint64_t file_id);
+        int64_t get_length(uint64_t file_id);
 
         int32_t read(uint64_t file_id, char* buffer, int64_t &length);
         int32_t save_metadata();
