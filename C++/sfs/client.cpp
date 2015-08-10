@@ -10,7 +10,7 @@
 #include "client.h"
 
 using std::unordered_map;
-Client::Client()
+Client::Client():latest_data(-1, 0, 0)
 {
     meta_datas = new unordered_map<uint64_t, MetaNode>();
 }
@@ -42,15 +42,24 @@ int32_t Client::init()
 
 int32_t Client::write(char* buffer, int64_t length)
 {
-    FILE* fp = fopen(DATA_STORAGE, "wr");
     int64_t new_offset = latest_data._start + latest_data._length;
+    FILE* fp = fopen(DATA_STORAGE, "wr");
     int32_t ret = fseek(fp, new_offset, SEEK_SET);
-    ret = fwrite(buffer, length, 1, fp);
+    if (ret == -1) {
+        printf("fseek failed\n");
+        return ret;
+    }
+    ret = fwrite(buffer, 1, length, fp);
+    if (ret == -1) {
+        printf("write failed\n");
+        return ret;
+    }
     int64_t file_id = latest_data._file_id + 1;
     MetaNode meta_node(file_id, new_offset, length);
+    (*meta_datas)[file_id] = meta_node;
     latest_data = meta_node;
     fclose(fp);
-    return 0;
+    return ret;
 }
 
 int64_t Client::get_length(uint64_t file_id)
@@ -66,24 +75,41 @@ int64_t Client::get_length(uint64_t file_id)
 int64_t Client::read(uint64_t file_id, char* buffer, int64_t &length)
 {
     
-    FILE* fp = fopen(DATA_STORAGE, "wr");
+    FILE* fp = fopen(DATA_STORAGE, "r");
+    if (fp == NULL) {
+        printf("open %s failed\n", DATA_STORAGE);
+        return -1;
+    }
     unordered_map<uint64_t, MetaNode>::iterator iter = meta_datas->find(file_id);
     if (iter == meta_datas->end()) {
+        printf("file did not exist, read failed\n");
         return -1;
     }
     int32_t ret = fseek(fp, (iter->second)._start, SEEK_SET);
-    ret = fwrite(buffer, length, 1, fp);
+    if (ret == -1) {
+        printf("fseek failed\n");
+        return ret;
+    }
+    ret = fread(buffer, 1, length, fp);
     fclose(fp);
-    return 0;
+    return ret;
 }
 int32_t Client::save_metadata()
 {
     unordered_map<uint64_t, MetaNode>::iterator iter = meta_datas->begin();
     int32_t fd = ::open(META_STORAGE, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+    if (fd < 0) {
+        printf("fseek failed\n");
+        return fd;
+    }
     // int32_t ret = ::write(fd, &(meta_datas->size()), (int)sizeof(meta_datas->size()));
     int32_t size = meta_datas->size();
     printf("meta_datas size:%d\n", size);
     int32_t ret = ::write(fd, &(size), sizeof(size));
+    if (ret == -1) {
+        printf("save metadata failed, can not write\n");
+        return ret;
+    }
     for (;iter != meta_datas->end(); ++iter) {
         int32_t ret = ::write(fd, (void*)(&(iter->second)), sizeof(MetaNode));
     }

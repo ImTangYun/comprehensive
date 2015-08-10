@@ -26,6 +26,11 @@ int32_t main(int argc, char** argv)
     char data[] = "hello this is my data";
     uint64_t file_id = client.write(data, strlen(data));
     int64_t file_length = client.get_length(file_id);
+    char *buf = new char[file_length + 1];
+    int64_t ret = client.read(file_id, buf, file_length);
+    buf[file_length] = '\0';
+    printf("file_id:%d,file_length:%d, %s\n", (int32_t)file_id,
+            (int32_t)file_length, buf);
     return 0;
 }
 
