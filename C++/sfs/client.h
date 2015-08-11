@@ -21,6 +21,13 @@ struct MetaNode
         _start = start;
         _length = length;
     }
+    string to_string()
+    {
+        char buffer[100];
+        snprintf(buffer, 100, "[file_id:%d, start:%d, length:%d]",
+                _file_id, _start, _length);
+        return buffer;
+    }
 };
 class Client
 {

@@ -25,25 +25,26 @@ int32_t Client::init()
     for (int32_t j = 0; j < size; ++j) {
         ::read(fd, &meta_node, sizeof(meta_node));
         (*meta_datas)[meta_node._file_id] = meta_node;
-        if (max_file_id < meta_node._file_id) {
+        if ((int32_t)max_file_id < (int32_t)meta_node._file_id) {
             max_file_id = meta_node._file_id;
         }
+        printf("max_file_id:%d,file_id: %d\n", max_file_id, meta_node._file_id);
     }
     close(fd);
-    if (max_file_id = -1) {
+    if (max_file_id == -1) {
         MetaNode meta_node(0, 0, 0);
         latest_data = meta_node;
     } else {
         latest_data = meta_datas->find(max_file_id)->second;
     }
-    printf("file num is: %d\n", size);
+    printf("file num is: %d max file_id is %d\n", size, max_file_id);
     return 0;
 }
 
 int32_t Client::write(char* buffer, int64_t length)
 {
     int64_t new_offset = latest_data._start + latest_data._length;
-    FILE* fp = fopen(DATA_STORAGE, "wr");
+    FILE* fp = fopen(DATA_STORAGE, "ab");
     int32_t ret = fseek(fp, new_offset, SEEK_SET);
     if (ret == -1) {
         printf("fseek failed\n");
@@ -86,12 +87,17 @@ int64_t Client::read(uint64_t file_id, char* buffer, int64_t &length)
         return -1;
     }
     int32_t ret = fseek(fp, (iter->second)._start, SEEK_SET);
-    printf("start %d\n", (iter->second)._start);
+    printf("meta_node: %s\n", (iter->second).to_string().c_str());
     if (ret == -1) {
         printf("fseek failed\n");
         return ret;
     }
-    ret = fread(buffer, 1, length, fp);
+    ret = fread(buffer, 1, (iter->second)._length, fp);
+    printf("read length: %d\n", ret);
+    buffer[(iter->second)._length] = '\0';
+    buffer[(iter->second)._length - 1] = '\n';
+    // snprintf(buffer, (iter->second)._length, "ha aha ah ahana  akjaksjk");
+    printf("buffer:%s\n", buffer);
     fclose(fp);
     return ret;
 }

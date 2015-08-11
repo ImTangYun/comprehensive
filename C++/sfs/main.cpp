@@ -29,20 +29,21 @@ void write(char* buf, int64_t length, Client &client)
 int32_t main(int argc, char** argv)
 {
     Client client;
-    char data[] = "hello this is my data";
-    uint64_t file_id = client.write(data, strlen(data));
+    client.init();
     char buff[100];
-    for (int i = 0; i < 100; ++i) {
-        int length = snprintf(buff, length, "this is the %dth data", i);
+    printf("meta data: %s\n", client.to_string().c_str());
+    for (int i = 0; i < 10; ++i) {
+        int length = snprintf(buff, 100, "this is the %dth data", i);
         write(buff, length, client);
     }
     printf("meta data: %s\n", client.to_string().c_str());
     int64_t file_length = client.get_length(27);
     char *buf = new char[file_length + 1];
-    int64_t ret = client.read(27, buf, file_length);
+    int64_t ret = client.read(5, buf, file_length);
     buf[file_length] = '\0';
-    printf("file_id:%d,file_length:%d, data:%s\n", (int32_t)27,
+    printf("file_id:%d,file_length:%d, data:%s\n", (int32_t)5,
             (int32_t)file_length, buf);
+    client.save_metadata();
     return 0;
 }
 
