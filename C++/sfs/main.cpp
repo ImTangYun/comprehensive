@@ -23,6 +23,7 @@ void test_init_save()
 void write(char* buf, int64_t length, Client &client)
 {
     uint64_t file_id = client.write(buf, length);
+    printf("write file_id %d\n", file_id);
 }
 
 int32_t main(int argc, char** argv)
@@ -35,6 +36,7 @@ int32_t main(int argc, char** argv)
         int length = snprintf(buff, length, "this is the %dth data", i);
         write(buff, length, client);
     }
+    printf("meta data: %s\n", client.to_string().c_str());
     int64_t file_length = client.get_length(27);
     char *buf = new char[file_length + 1];
     int64_t ret = client.read(27, buf, file_length);

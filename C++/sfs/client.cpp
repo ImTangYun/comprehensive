@@ -59,7 +59,7 @@ int32_t Client::write(char* buffer, int64_t length)
     (*meta_datas)[file_id] = meta_node;
     latest_data = meta_node;
     fclose(fp);
-    return ret;
+    return file_id;
 }
 
 int64_t Client::get_length(uint64_t file_id)
@@ -86,6 +86,7 @@ int64_t Client::read(uint64_t file_id, char* buffer, int64_t &length)
         return -1;
     }
     int32_t ret = fseek(fp, (iter->second)._start, SEEK_SET);
+    printf("start %d\n", (iter->second)._start);
     if (ret == -1) {
         printf("fseek failed\n");
         return ret;
@@ -102,7 +103,6 @@ int32_t Client::save_metadata()
         printf("fseek failed\n");
         return fd;
     }
-    // int32_t ret = ::write(fd, &(meta_datas->size()), (int)sizeof(meta_datas->size()));
     int32_t size = meta_datas->size();
     printf("meta_datas size:%d\n", size);
     int32_t ret = ::write(fd, &(size), sizeof(size));
