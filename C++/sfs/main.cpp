@@ -26,22 +26,41 @@ void write(char* buf, int64_t length, Client &client)
     printf("write file_id %d\n", file_id);
 }
 
+uint64_t write(char* file_name, Client &client)
+{
+    if (file_name == NULL) {
+        printf("file name is null");
+        return -1;
+    }
+    FILE* fp = fopen(file_name, "rb");
+    if (fp == NULL) {
+        printf("file %s did not exist!", file_name);
+        return -1;
+    }
+    fseek(fp, 0L, SEEK_END);
+    int64_t flength = ftell(fp);
+    char* buff = new char[flength + 1];
+    fseek(fp, 0L, SEEK_SET);
+    fread(buff, 1, flength, fp);
+    buff[flength] = '\n';
+    printf("test.dat:%s\n", buff);
+    uint64_t file_id = client.write(buff, flength);
+    delete [] buff;
+    printf("file %s is wrote as file_id %d\n", file_name, file_id);
+    return file_id;
+}
+
 int32_t main(int argc, char** argv)
 {
     Client client;
     client.init();
-    char buff[100];
     printf("meta data: %s\n", client.to_string().c_str());
-    for (int i = 0; i < 10; ++i) {
-        int length = snprintf(buff, 100, "this is the %dth data", i);
-        write(buff, length, client);
-    }
-    printf("meta data: %s\n", client.to_string().c_str());
-    int64_t file_length = client.get_length(27);
-    char *buf = new char[file_length + 1];
-    int64_t ret = client.read(5, buf, file_length);
+    uint64_t file_id = write("test.dat", client);
+    int64_t file_length = client.get_length(file_id);
+    char *buf = new char[file_length];
+    int64_t ret = client.read(file_id, buf, file_length);
     buf[file_length] = '\0';
-    printf("file_id:%d,file_length:%d, data:%s\n", (int32_t)5,
+    printf("file_id:%d,file_length:%d, data:%s\n", (int32_t)file_id,
             (int32_t)file_length, buf);
     client.save_metadata();
     return 0;
