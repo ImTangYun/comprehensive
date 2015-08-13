@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include "common.h"
 #include "client.h"
+#include "file_utils.h"
 
 using std::unordered_map;
 Client::Client():latest_data(-1, 0, 0)
@@ -17,6 +18,10 @@ Client::Client():latest_data(-1, 0, 0)
 
 int32_t Client::init()
 {
+    int32_t file_size = FileUtils::get_file_size(META_STORAGE);
+    if (file_size <= 4) {
+        return -1;
+    }
     int32_t fd = ::open(META_STORAGE, O_RDONLY);
     int32_t size;
     MetaNode meta_node;

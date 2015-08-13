@@ -46,7 +46,7 @@ uint64_t write(char* file_name, Client &client)
     printf("test.dat:%s\n", buff);
     uint64_t file_id = client.write(buff, flength);
     delete [] buff;
-    printf("file %s is wrote as file_id %d\n", file_name, file_id);
+    // printf("file %s is wrote as file_id %d\n", file_name, file_id);
     return file_id;
 }
 
