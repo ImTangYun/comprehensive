@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "client.h"
+#include "file_utils.h"
 
 
 void test_init_save()
@@ -26,19 +27,18 @@ void write(char* buf, int64_t length, Client &client)
     printf("write file_id %d\n", file_id);
 }
 
-uint64_t write(char* file_name, Client &client)
+uint64_t write(const char* file_name, Client &client)
 {
     if (file_name == NULL) {
         printf("file name is null");
         return -1;
     }
-    FILE* fp = fopen(file_name, "rb");
-    if (fp == NULL) {
-        printf("file %s did not exist!", file_name);
+    int64_t flength = (int64_t)FileUtils::get_file_size(file_name);
+    if (flength <= 0) {
+        printf("file %s did not exist!, file length: %d", file_name, flength);
         return -1;
     }
-    fseek(fp, 0L, SEEK_END);
-    int64_t flength = ftell(fp);
+    FILE* fp = fopen(file_name, "rb");
     char* buff = new char[flength + 1];
     fseek(fp, 0L, SEEK_SET);
     fread(buff, 1, flength, fp);
@@ -46,11 +46,11 @@ uint64_t write(char* file_name, Client &client)
     printf("test.dat:%s\n", buff);
     uint64_t file_id = client.write(buff, flength);
     delete [] buff;
-    // printf("file %s is wrote as file_id %d\n", file_name, file_id);
+    printf("file %s is wrote as file_id %d\n", file_name, file_id);
     return file_id;
 }
 
-int32_t main(int argc, char** argv)
+void write_file_test()
 {
     Client client;
     client.init();
@@ -63,6 +63,10 @@ int32_t main(int argc, char** argv)
     printf("file_id:%d,file_length:%d, data:%s\n", (int32_t)file_id,
             (int32_t)file_length, buf);
     client.save_metadata();
+}
+
+int32_t main(int argc, char** argv)
+{
     return 0;
 }
 

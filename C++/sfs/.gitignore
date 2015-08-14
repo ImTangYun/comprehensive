@@ -12,3 +12,4 @@ Makefile
 Makefile.in
 *.dat
 *.idx
+clean

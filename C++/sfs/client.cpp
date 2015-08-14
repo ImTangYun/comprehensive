@@ -20,6 +20,8 @@ int32_t Client::init()
 {
     int32_t file_size = FileUtils::get_file_size(META_STORAGE);
     if (file_size <= 4) {
+        MetaNode meta_node(0, 0, 0);
+        latest_data = meta_node;
         return -1;
     }
     int32_t fd = ::open(META_STORAGE, O_RDONLY);
@@ -111,7 +113,7 @@ int32_t Client::save_metadata()
     unordered_map<uint64_t, MetaNode>::iterator iter = meta_datas->begin();
     int32_t fd = ::open(META_STORAGE, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
     if (fd < 0) {
-        printf("fseek failed\n");
+        printf("open %s failed\n", META_STORAGE);
         return fd;
     }
     int32_t size = meta_datas->size();
