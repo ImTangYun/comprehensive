@@ -67,6 +67,15 @@ void write_file_test()
 
 int32_t main(int argc, char** argv)
 {
+    Client client;
+    client.init();
+    printf("meta data: %s\n", client.to_string().c_str());
+    uint64_t file_id = write("test/main", client);
+    int64_t file_length = client.get_length(file_id);
+    char *buf = new char[file_length];
+    int64_t ret = client.read(file_id, buf, file_length);
+    FileUtils::write(buf, file_length, "test/main.bak");
+    client.save_metadata();
     return 0;
 }
 

@@ -19,3 +19,4 @@ rm -f depcomp
 rm -f install-sh
 rm -f Makefile
 rm -f missing
+mkdir "test"
