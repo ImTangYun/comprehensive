@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'application'
+
+run {
+    args 'sample.txt'
+}
+
+war {
+    baseName = 'lelab-uploading'
+    version =  '0.1'
+}
+
+repositories {
+    mavenLocal()
+    maven { url "http://10.100.125.138:80/nexus/content/groups/public/" }
+    mavenCentral()
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+dependencies {
+    compile(
+            "org.springframework.boot:spring-boot-starter-web",
+            "org.springframework.boot:spring-boot-starter-data-mongodb",
+            "org.springframework.boot:spring-boot-starter-actuator",
+            "org.apache.httpcomponents:httpclient:4.4.1",
+            "org.apache.httpcomponents:httpmime:4.4.1",
+            "org.apache.commons:commons-lang3:3.4",
+            "com.alibaba:fastjson:1.2.0",
+            "org.javatuples:javatuples:1.2",
+            "org.tuckey:urlrewritefilter:4.0.3",
+    )
+    testCompile(
+            "org.springframework:spring-test:4.1.6.RELEASE",
+            "junit:junit:4.12"
+    )
+}
