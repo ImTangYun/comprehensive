@@ -1,11 +1,12 @@
 package pers.candy.learning.annotation;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Set;
 
 public class ProxyTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Proxy proxy = new Proxy();
 
         Set<Class<?>> set = Proxy.getClasses("pers.candy.learning.annotation");
@@ -18,6 +19,12 @@ public class ProxyTest {
             }
 
         }
+        
+        proxy.mappingRequest();
+        
+        System.out.println("=================");
+        
+        proxy.processRequest("method=get;uri=test/foo1/;data=hello i am Candy, how are you!");
 
     }
 }

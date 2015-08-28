@@ -17,6 +17,8 @@ public class Test {
                 method.invoke(apple, "----");
             }
         }
+        String outString = null + "hello";
+        System.out.println("/".split("/").length);
     }
 
 }

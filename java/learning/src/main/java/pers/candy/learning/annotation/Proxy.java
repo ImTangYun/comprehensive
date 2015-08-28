@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Enumeration;
@@ -16,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.net.JarURLConnection;
 
 public class Proxy {
 
@@ -74,13 +74,29 @@ public class Proxy {
             }
         }
     }
-    
-    private Function getFunction(String uri, Map<String, Function> requestMap) {
-        
+
+    private Function getFunction(String uri, Map<String, Function> requestMap)
+            throws Exception {
+
+        String[] uriA = uri.split("/");
+        if (uriA.length == 0) {
+            throw new Exception("unknown resource");
+        }
+
+        String uriRoot = "";
+        for (int i = 0; i < uriA.length; ++i) {
+            if (uriRoot.length() > maxLength)
+                break;
+            uriRoot += uriA[i] + "/";
+            System.out.println("uriRoot:" + uriRoot);
+            if (requestMap.containsKey(uriRoot)) {
+                return requestMap.get(uriRoot);
+            }
+        }
         return null;
-        
+
     }
-    
+
     public void processRequest(String request) throws Exception {
         Map<String, String> req = parseRequest(request);
         if (!req.containsKey("uri")) {
@@ -91,13 +107,16 @@ public class Proxy {
         }
         String uri = req.get("uri");
         String uriMethod = req.get("method");
+        System.out.println("uri:" + uri + ", uriMethod:" + uriMethod);
         Function function = null;
         if (uriMethod.equals(pers.candy.learning.annotation.Method.GET)) {
-            function = getFunction(uriMethod, getMap);
+            function = getFunction(uri, getMap);
         } else if (uriMethod.equals(pers.candy.learning.annotation.Method.POST)) {
-            function = getFunction(uriMethod, postMap);
+            function = getFunction(uri, postMap);
         }
-        function.getMethod().invoke(function.getObject(), req);
+        
+        if (function != null)
+            function.getMethod().invoke(function.getObject(), req);
     }
 
     /**
