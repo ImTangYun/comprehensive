@@ -44,8 +44,8 @@ public class Proxy {
             RequestMapping requestMapping = null;
             if ((requestMapping = str.getAnnotation(RequestMapping.class)) != null) {
                 String root = requestMapping.value();
-                System.out.println(str.getAnnotation(RequestMapping.class));
-                System.out.println(str.getCanonicalName());
+//                System.out.println(str.getAnnotation(RequestMapping.class));
+//                System.out.println(str.getCanonicalName());
                 Method[] methods = str.getDeclaredMethods();
                 Constructor<?> con = str.getConstructor(null);
                 Object object = (Object) con.newInstance(null);
@@ -88,7 +88,6 @@ public class Proxy {
             if (uriRoot.length() > maxLength)
                 break;
             uriRoot += uriA[i] + "/";
-            System.out.println("uriRoot:" + uriRoot);
             if (requestMap.containsKey(uriRoot)) {
                 return requestMap.get(uriRoot);
             }
@@ -107,7 +106,6 @@ public class Proxy {
         }
         String uri = req.get("uri");
         String uriMethod = req.get("method");
-        System.out.println("uri:" + uri + ", uriMethod:" + uriMethod);
         Function function = null;
         if (uriMethod.equals(pers.candy.learning.annotation.Method.GET)) {
             function = getFunction(uri, getMap);
