@@ -1,8 +1,11 @@
 package pers.candy.learning.implement.hashmap;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class HashMap<K, V> implements Map<K, V> {
 
-    static class Entry {
+    public static class Entry {
         
         Object key;
         
@@ -13,6 +16,7 @@ public class HashMap<K, V> implements Map<K, V> {
         Entry next;
     }
 
+    List<Entry> entries;
     
     Entry table[];
     
@@ -24,6 +28,7 @@ public class HashMap<K, V> implements Map<K, V> {
         for (int i = 0; i < table.length; ++i) {
             table[i] = null;
         }
+        entries = new LinkedList<Entry>();
     }
 
     @Override
@@ -83,6 +88,9 @@ public class HashMap<K, V> implements Map<K, V> {
         entry.key = key;
         entry.value = value;
         insertNode(entry, index);
+        if (entries != null) {
+            entries.add(entry);
+        }
         return true;
     }
     
@@ -137,6 +145,7 @@ public class HashMap<K, V> implements Map<K, V> {
         if (entry.key.equals(key)) {
             table[index] = entry.next;
             --size;
+            entries = null;
             return true;
         }
         
@@ -144,6 +153,7 @@ public class HashMap<K, V> implements Map<K, V> {
             if (entry.next.key.equals(key)) {
                 entry = entry.next.next;
                 --size;
+                entries = null;
                 return true;
             }
             entry = entry.next;
@@ -178,5 +188,22 @@ public class HashMap<K, V> implements Map<K, V> {
             tmp = tmp.next;
             insertNode(node, index);
         }
+    }
+
+    @Override
+    public List<Entry> entries() {
+        if (entries == null) {
+            entries = new LinkedList<Entry>();
+            for (Entry entry : table) {
+                if (entry != null) {
+                    Entry tmp = entry;
+                    while (tmp != null) {
+                        entries.add(tmp);
+                        tmp = tmp.next;
+                    }
+                }
+            }
+        }
+        return entries;
     }
 }

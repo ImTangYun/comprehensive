@@ -1,5 +1,9 @@
 package pers.candy.learning.implement.hashmap;
 
+import java.util.List;
+
+import pers.candy.learning.implement.hashmap.HashMap.Entry;
+
 public interface Map<K, V> {
 
     public V getValue(K key);
@@ -8,8 +12,10 @@ public interface Map<K, V> {
     
     public int size();
 
-    boolean contains(K key);
+    public boolean contains(K key);
     
-    boolean remove(K key);
+    public boolean remove(K key);
+    
+    public List<Entry> entries();
     
 }
