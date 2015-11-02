@@ -13,8 +13,9 @@ class Packet;
 class NetMachine
 {
     public:
+        int Init();
         NetMachine():communicate_loop_(new CommunicateLoop()) {}
-        int Listen(int port);
+        int AsyncListen(int port);
         int AsyncSendPacket(const string &ip_port, Packet* packet);
     private:
         CommunicateLoop* communicate_loop_;

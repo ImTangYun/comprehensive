@@ -6,10 +6,20 @@
 #include "packet.h"
 #include "net_machine.h"
 #include "stream_socket_context.h"
+#include "listen_socket_context.h"
 
-int NetMachine::Listen(int port)
+int NetMachine::Init()
 {
-
+    communicate_loop_->Start();
+    return 0;
+}
+int NetMachine::AsyncListen(int port)
+{
+    ListenSocketContext* listen_socket_context = new ListenSocketContext(
+            port, communicate_loop_);
+    listen_socket_context->Init();
+    communicate_loop_->Start();
+    return 0;
 }
 int NetMachine::AsyncSendPacket(const string &ip_port, Packet* packet)
 {

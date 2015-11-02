@@ -14,8 +14,8 @@ void CommunicateLoop::Run(CThread* cthread, void* args)
 void CommunicateLoop::Process(int thread_id)
 {
     while (is_run_) {
-        printf("thread: %d\n", thread_id);
-        sleep(1);
+        // printf("thread: %d\n", thread_id);
+        usleep(10);
         HandleEvent();
     }
 }
@@ -26,6 +26,7 @@ void CommunicateLoop::Init()
 
 void CommunicateLoop::Start()
 {
+    if (is_run_) return;
     is_run_ = true;
     event_loop_thread_ = new CThread();
     int* which_thread = new int(0);
@@ -45,31 +46,35 @@ void CommunicateLoop::HandleEvent()
     for (int i = 0; i < nfds; ++i) {
         if (events[i].events & EPOLLIN) {
             printf("EPOLLIN\n");
-            StreamSocketContext* socket_context = (StreamSocketContext*)events[i].data.ptr;
+            SocketContext* socket_context = (SocketContext*)events[i].data.ptr;
             socket_context->HandleInput();
         } else if (events[i].events & EPOLLOUT) {
             printf("EPOLLOUT\n");
-            StreamSocketContext* socket_context = (StreamSocketContext*)events[i].data.ptr;
+            SocketContext* socket_context = (SocketContext*)events[i].data.ptr;
             socket_context->HandleOutput();
         }
     }
 }
 
-int CommunicateLoop::AddEvent(StreamSocketContext* socket_context,
+int CommunicateLoop::AddEvent(SocketContext* socket_context,
         bool readable, bool writable)
 {
-    struct epoll_event *ev = new epoll_event();
-    (ev->data).ptr = (void*) socket_context;
-    ev->events = EPOLLOUT | EPOLLIN | 0;
-    return epoll_ctl(efd_, EPOLL_CTL_ADD, socket_context->fd(), ev);
+    struct epoll_event ev;
+    ev.data.ptr = (void*) socket_context;
+    if (readable && !writable)
+        ev.events = EPOLLET | EPOLLIN;
+    if (readable && writable)
+        ev.events = EPOLLOUT | EPOLLIN | 0;
+    socket_context_list_.push_back(socket_context);
+    return epoll_ctl(efd_, EPOLL_CTL_ADD, socket_context->fd(), &ev);
 }
 
-int CommunicateLoop::SetWritable(StreamSocketContext* socket_context, bool writable)
+int CommunicateLoop::SetWritable(SocketContext* socket_context, bool writable)
 {
     return 0;
 }
 
-int CommunicateLoop::ClearEvent(StreamSocketContext* socket_context)
+int CommunicateLoop::ClearEvent(SocketContext* socket_context)
 {
     return 0;
 }

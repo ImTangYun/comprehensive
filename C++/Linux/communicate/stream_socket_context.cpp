@@ -5,7 +5,6 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <arpa/inet.h>
 #include <string.h>
 #include "task_queue.h"
@@ -41,27 +40,6 @@ int StreamSocketContext::Init()
     return 0;
 }
 
-int StreamSocketContext::ParseIpPort()
-{
-    ip_ = new char[16];
-    int i = 0;
-    for (; i < ip_port_.length(); ++i) {
-        if (ip_port_[i] == ':') break;
-        ip_[i] = ip_port_[i];
-    }
-    ip_[i] = '\0';
-    char buff[10];
-    int count = 0;
-    ++i;
-    for (; i < ip_port_.length(); ++i) {
-        buff[count] = ip_port_[i];
-        ++count;
-    }
-    buff[count] = '\0';
-    port_ = atoi(buff);
-    return 0;
-}
-
 int StreamSocketContext::AsyncSendPacket(Packet* packet)
 {
     if (packet == NULL) return -1;
@@ -73,27 +51,29 @@ int StreamSocketContext::HandleOutput()
 {
     printf("HandleOutput()\n");
     Packet* packet = packet_queue_->Pop();
-    int32_t channel_id = packet->channel_id();
-    int32_t data_length = packet->data_length();
+    uint32_t channel_id = htonl(packet->channel_id());
+    uint32_t data_length = htonl(packet->data_length());
+    printf("channel_id:%d, data_length:%d\n", channel_id, data_length);
     char* data = packet->data();
-    int32_t total_length = sizeof(channel_id) +
-        sizeof(data_length) + data_length;
+    uint32_t total_length = sizeof(channel_id) +
+        sizeof(data_length) + packet->data_length();
     char* buff = new char[sizeof(channel_id) +
         sizeof(data_length) + data_length + 1];
-    int32_t* buff_int = reinterpret_cast<int32_t*>(buff);
+    uint32_t* buff_int = reinterpret_cast<uint32_t*>(buff);
     buff_int[0] = channel_id;
     buff_int[1] = data_length;
     char* buff_data = buff + sizeof(channel_id) + sizeof(data_length);
-    memcpy(buff_data, data, data_length);
-    Send(buff_data, total_length);
+    memcpy(buff_data, data, packet->data_length());
+    Send(buff, total_length);
+    delete [] buff;
     return 0;
 }
 
-int StreamSocketContext::Send(char* data, int32_t length)
+int StreamSocketContext::Send(char* data, uint32_t length)
 {
-    int sent_length = 0;
+    uint32_t sent_length = 0;
     while (true) {
-        int ret = send(fd_, data + sent_length, length - sent_length, 0);
+        uint32_t ret = send(fd_, data + sent_length, length - sent_length, 0);
         if (ret < 0) {
             printf("sending error!\n");
             return ret;
@@ -102,10 +82,47 @@ int StreamSocketContext::Send(char* data, int32_t length)
         if (sent_length == length) {
             return 0;
         }
+        printf("sent length: %u\n", sent_length);
     }
 }
 
 int StreamSocketContext::HandleInput()
 {
+    int received_length = 0;
+    while (true) {
+        sleep(1);
+        int ret = recv(fd_, recv_buffer_ + received_length,
+                recv_buffer_length_ - received_length, 0);
+        printf("receiving.... buf len: %d, ret: %d fd_:%d\n",
+                recv_buffer_length_, ret, fd_);
+        if (ret <= 0) {
+            break;
+        }
+        received_length += ret;
+        AdjustBuffer(received_length);
+    }
+    recv_buffer_[received_length] = '\0';
+    printf("received: %s\n", recv_buffer_);
+    Packet* packet = new Packet();
+    // packet->set_packet();
     return 0;
+}
+
+int StreamSocketContext::AdjustBuffer(int received_length)
+{
+    if (received_length >= (recv_buffer_length_ / 2) &&
+            recv_buffer_length_ < 1024 * 1024 * 10) {
+        char* new_buffer = new char[2 * recv_buffer_length_];
+        memcpy(new_buffer, recv_buffer_, received_length);
+        delete [] recv_buffer_;
+        recv_buffer_ = new_buffer;
+        recv_buffer_length_ *= 2;
+    } else if (received_length < recv_buffer_length_ / 3 &&
+            recv_buffer_length_ > 111) {
+        char* new_buffer = new char[recv_buffer_length_ / 2]; 
+        memcpy(new_buffer, recv_buffer_, received_length);
+        delete [] recv_buffer_;
+        recv_buffer_ = new_buffer;
+        recv_buffer_length_ /= 2;
+    }
 }

@@ -12,17 +12,17 @@ class Channel
         {
             pthread_mutex_init(&mutex_, NULL); 
         }
-        int32_t GenerateNewId()
+        uint32_t GenerateNewId()
         {
             pthread_mutex_lock(&mutex_);
             ++max_id_;
             pthread_mutex_unlock(&mutex_);
             return max_id_;
         }
-        int32_t max_id() { return max_id_; }
-        int32_t ChannelNum() { return max_id_ + 1; }
+        uint32_t max_id() { return max_id_; }
+        uint32_t ChannelNum() { return max_id_ + 1; }
     private:
-        int32_t max_id_;
+        uint32_t max_id_;
         pthread_mutex_t mutex_;
 };
 #endif
