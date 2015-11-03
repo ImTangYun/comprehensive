@@ -12,9 +12,15 @@ using myspace::TaskQueue;
 class Packet;
 class CommunicateLoop;
 class NetHandler;
+class NetMachine;
 class StreamSocketContext: public SocketContext
 {
     public:
+        StreamSocketContext(const string &ip_port, NetHandler* net_handler, NetMachine* net_machine):
+                SocketContext(ip_port, NULL), net_machine_(net_machine),
+                packet_queue_(new TaskQueue<Packet*>()), recv_buffer_(new char[111]),
+                recv_buffer_length_(111),
+                net_handler_(net_handler){}
         StreamSocketContext(const string &ip_port,
                 CommunicateLoop* communicate_loop, NetHandler* net_handler):
                 SocketContext(ip_port, communicate_loop),
@@ -40,6 +46,7 @@ class StreamSocketContext: public SocketContext
         char* recv_buffer_;
         int recv_buffer_length_;
         NetHandler* net_handler_;
+        NetMachine* net_machine_;
 };
 
 #endif

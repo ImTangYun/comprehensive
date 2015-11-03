@@ -12,6 +12,7 @@
 #include "communicate_loop.h"
 #include "packet.h"
 #include "net_handler.h"
+#include "net_machine.h"
 int StreamSocketContext::Init()
 {
     if (ip_ != NULL) {
@@ -37,7 +38,7 @@ int StreamSocketContext::Init()
     }
 
     printf("return code of AddEvent is %d\n",
-            communicate_loop_->AddEvent(this, true, true));
+            net_machine_->communicate_loop()->AddEvent(this, true, true));
     return 0;
 }
 

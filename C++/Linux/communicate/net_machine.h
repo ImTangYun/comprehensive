@@ -10,7 +10,7 @@
 using std::string;
 class Packet;
 class NetHandler;
-
+class EndPoint;
 class NetMachine
 {
     public:
@@ -18,6 +18,8 @@ class NetMachine
         NetMachine():communicate_loop_(new CommunicateLoop()) {}
         int AsyncListen(int port, NetHandler* net_handler);
         int AsyncSendPacket(const string &ip_port, Packet* packet, NetHandler* net_handler);
+        int AsyncSendPacket(EndPoint* end_point, Packet* packet, NetHandler* net_handler);
+        CommunicateLoop* communicate_loop() {return communicate_loop_;}
     private:
         CommunicateLoop* communicate_loop_;
 };

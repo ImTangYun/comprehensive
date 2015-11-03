@@ -25,6 +25,10 @@ class SocketContext
         virtual int HandleInput() = 0;
         virtual void OnReceived() = 0;
         int ParseIpPort();
+        void set_communicate_loop(CommunicateLoop* communicate_loop)
+        {
+            communicate_loop_ = communicate_loop;
+        }
     protected:
         CommunicateLoop* communicate_loop_;
         string ip_port_;

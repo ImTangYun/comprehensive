@@ -7,6 +7,7 @@
 #include "net_machine.h"
 #include "stream_socket_context.h"
 #include "listen_socket_context.h"
+#include "end_point.h"
 int NetMachine::Init()
 {
     communicate_loop_->Start();
@@ -34,5 +35,14 @@ int NetMachine::AsyncSendPacket(const string &ip_port,
         stream_socket_context->AsyncSendPacket(packet);
         sleep(1);
     }
+    return 0;
+}
+int NetMachine::AsyncSendPacket(EndPoint* end_point,
+        Packet* packet, NetHandler* net_handler)
+{
+    printf("stream_socket_context init success!\n");
+    communicate_loop_->Start();
+    end_point->socket_context()->set_communicate_loop(communicate_loop_);
+    end_point->socket_context()->AsyncSendPacket(packet);
     return 0;
 }
