@@ -11,6 +11,7 @@
 #include "stream_socket_context.h"
 #include "communicate_loop.h"
 #include "packet.h"
+#include "net_handler.h"
 int StreamSocketContext::Init()
 {
     if (ip_ != NULL) {
@@ -53,7 +54,7 @@ int StreamSocketContext::HandleOutput()
     Packet* packet = packet_queue_->Pop();
     uint32_t channel_id = htonl(packet->channel_id());
     uint32_t data_length = htonl(packet->data_length());
-    printf("channel_id:%d, data_length:%d\n", channel_id, data_length);
+    printf("channel_id:%d, data_length:%d\n", channel_id, packet->data_length());
     char* data = packet->data();
     uint32_t total_length = sizeof(channel_id) +
         sizeof(data_length) + packet->data_length();
@@ -90,21 +91,30 @@ int StreamSocketContext::HandleInput()
 {
     int received_length = 0;
     while (true) {
-        sleep(1);
+        // sleep(1);
         int ret = recv(fd_, recv_buffer_ + received_length,
                 recv_buffer_length_ - received_length, 0);
-        printf("receiving.... buf len: %d, ret: %d fd_:%d\n",
-                recv_buffer_length_, ret, fd_);
+        // printf("receiving.... buf len: %d, ret: %d fd_:%d\n",
+        //        recv_buffer_length_, ret, fd_);
         if (ret <= 0) {
             break;
         }
         received_length += ret;
         AdjustBuffer(received_length);
     }
-    recv_buffer_[received_length] = '\0';
-    printf("received: %s\n", recv_buffer_);
-    Packet* packet = new Packet();
-    // packet->set_packet();
+    recv_buffer_[received_length]= '\0';
+    // printf("received: %s, length:%d\n", recv_buffer_, received_length);
+    uint32_t* head = reinterpret_cast<uint32_t*>(recv_buffer_);
+    uint32_t channel_id = ntohl(head[0]);
+    uint32_t data_length = ntohl(head[1]);
+    Packet* packet = new Packet(channel_id);
+    packet->set_packet(recv_buffer_ + sizeof(channel_id) +
+            sizeof(data_length), data_length);
+    if (received_length == 0) {
+        printf("disconnected\n");
+        return -1;
+    }
+    net_handler_->OnReceived(packet);
     return 0;
 }
 

@@ -5,7 +5,7 @@
 #include "packet.h"
 #include "communicate_loop.h"
 #include "net_handler.h"
-#include "listen_handler.h"
+#include "stream_handler.h"
 
 int main()
 {
@@ -14,13 +14,8 @@ int main()
     char* data = new char[100];
     uint32_t length = snprintf(data, 100, "hello world");
     packet->set_packet(data, length);
-    // net_machine.AsyncSendPacket("127.0.0.1:6666", packet);
-    // net_machine.AsyncSendPacket("127.0.0.1:6666", packet);
-    // net_machine.AsyncSendPacket("127.0.0.1:6666", packet);
-    NetHandler* net_handler = new ListenHandler();
-    net_machine.AsyncListen(1235, net_handler);
-    while (true) {
-        sleep(1);
-    }
+    NetHandler* net_handler = new StreamHandler();
+    net_machine.AsyncSendPacket("127.0.0.1:1235", packet, net_handler);
+    sleep(50);
     return 0;
 }

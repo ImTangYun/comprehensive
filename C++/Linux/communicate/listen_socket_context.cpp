@@ -11,6 +11,7 @@
 #include "stream_socket_context.h"
 #include "listen_socket_context.h"
 #include "communicate_loop.h"
+#include "listen_handler.h"
 int ListenSocketContext::Init()
 {
     struct sockaddr_in servaddr; 
@@ -60,9 +61,11 @@ int ListenSocketContext::HandleInput()
     char ip_port[30];
     snprintf(ip_port, 30, "%s:%d", ip, port);
     
-    SocketContext* socket_context = new StreamSocketContext(ip_port, communicate_loop_);
+    SocketContext* socket_context = new
+        StreamSocketContext(ip_port, communicate_loop_, net_handler_);
     socket_context->ParseIpPort();
     socket_context->set_fd(connfd);
+    net_handler_->OnAccepted(connfd);
     communicate_loop_->AddEvent(socket_context, true, false);
     return 0;
 }
