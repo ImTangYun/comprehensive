@@ -47,7 +47,14 @@ void CommunicateLoop::HandleEvent()
         if (events[i].events & EPOLLIN) {
             printf("EPOLLIN\n");
             SocketContext* socket_context = (SocketContext*)events[i].data.ptr;
-            socket_context->HandleInput();
+            int ret = socket_context->HandleInput();
+
+            // forign connection is closed, release it;
+            if (ret == -1) {
+                ClearEvent(socket_context);
+                socket_context_list_.remove(socket_context);
+                delete socket_context;
+            }
         } else if (events[i].events & EPOLLOUT) {
             printf("EPOLLOUT\n");
             SocketContext* socket_context = (SocketContext*)events[i].data.ptr;
@@ -61,20 +68,29 @@ int CommunicateLoop::AddEvent(SocketContext* socket_context,
 {
     struct epoll_event ev;
     ev.data.ptr = (void*) socket_context;
-    if (readable && !writable)
-        ev.events = EPOLLET | EPOLLIN;
-    if (readable && writable)
-        ev.events = EPOLLOUT | EPOLLIN | 0;
+    ev.events = EPOLLET;
+    if (readable)
+        ev.events |= EPOLLIN;
+    if (writable)
+        ev.events |= EPOLLOUT;
     socket_context_list_.push_back(socket_context);
     return epoll_ctl(efd_, EPOLL_CTL_ADD, socket_context->fd(), &ev);
 }
 
-int CommunicateLoop::SetWritable(SocketContext* socket_context, bool writable)
+int CommunicateLoop::SetEvent(SocketContext* socket_context, bool writable, bool readable)
 {
-    return 0;
+    struct epoll_event ev;
+    ev.data.ptr = (void*) socket_context;
+    ev.events = EPOLLET;
+    if (readable)
+        ev.events |= EPOLLIN;
+    if (writable)
+        ev.events |= EPOLLOUT;
+    socket_context_list_.push_back(socket_context);
+    return epoll_ctl(efd_, EPOLL_CTL_MOD, socket_context->fd(), &ev);
 }
 
 int CommunicateLoop::ClearEvent(SocketContext* socket_context)
 {
-    return 0;
+    return epoll_ctl(efd_, EPOLL_CTL_DEL, socket_context->fd(), NULL);
 }

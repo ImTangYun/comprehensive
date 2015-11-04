@@ -4,6 +4,13 @@
 //
 #ifndef SOCKET_CONTEXT
 #define SOCKET_CONTEXT
+#include <sys/types.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <string>
 // #include "communicate_loop.h"
 class CommunicateLoop;
@@ -28,6 +35,20 @@ class SocketContext
         void set_communicate_loop(CommunicateLoop* communicate_loop)
         {
             communicate_loop_ = communicate_loop;
+        }
+        void SetNonblocking(int sock)
+        {
+            int opts;
+            opts = fcntl(sock, F_GETFL);
+            if (opts < 0) {
+                perror("set nonblocking\n");
+                exit(1);
+            }
+            opts = opts | O_NONBLOCK;
+            if (fcntl(sock, F_SETFL, opts) < 0) {
+                perror("set nonblocking2\n");
+                exit(1);
+            }
         }
     protected:
         CommunicateLoop* communicate_loop_;

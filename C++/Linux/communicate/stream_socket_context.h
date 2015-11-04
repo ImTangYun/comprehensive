@@ -7,6 +7,7 @@
 #include <string>
 #include "task_queue.h"
 #include "socket_context.h"
+#include "end_point.h"
 using std::string;
 using myspace::TaskQueue;
 class Packet;
@@ -33,6 +34,8 @@ class StreamSocketContext: public SocketContext
             packet_queue_ = NULL;
             delete [] recv_buffer_;
             recv_buffer_ = NULL;
+            delete end_point_;
+            end_point_ = NULL;
         }
         int Init();
         int AsyncSendPacket(Packet* packet);
@@ -40,6 +43,14 @@ class StreamSocketContext: public SocketContext
         virtual int HandleInput();
         virtual void OnReceived() {}
         int AdjustBuffer(int received_length);
+        void set_end_point(EndPoint* end_point)
+        {
+            end_point_ = end_point;
+        }
+        EndPoint* end_point()
+        {
+            return end_point_;
+        }
     private:
         int Send(char* data, uint32_t length);
         TaskQueue<Packet*>* packet_queue_;
@@ -47,6 +58,7 @@ class StreamSocketContext: public SocketContext
         int recv_buffer_length_;
         NetHandler* net_handler_;
         NetMachine* net_machine_;
+        EndPoint* end_point_;
 };
 
 #endif

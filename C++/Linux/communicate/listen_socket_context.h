@@ -21,7 +21,5 @@ class ListenSocketContext: public SocketContext
     private:
         int server_port_;
         NetHandler* net_handler_;
-
-        void SetNonblocking(int sock);
 };
 #endif

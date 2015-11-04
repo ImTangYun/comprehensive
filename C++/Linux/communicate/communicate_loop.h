@@ -21,7 +21,7 @@ class CommunicateLoop: public Runnuble
         void Stop();
         int AddEvent(SocketContext* socket_context,
                 bool readable, bool writable);
-        int SetWritable(SocketContext* socket_context, bool writable);
+        int SetEvent(SocketContext* socket_context, bool writable, bool readable);
         int ClearEvent(SocketContext* socket_context);
         void HandleEvent();
         virtual ~CommunicateLoop()

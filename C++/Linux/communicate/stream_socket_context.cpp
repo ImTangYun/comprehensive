@@ -36,6 +36,7 @@ int StreamSocketContext::Init()
         perror("connect error");
         return -1;
     }
+    SetNonblocking(fd_);
 
     printf("return code of AddEvent is %d\n",
             net_machine_->communicate_loop()->AddEvent(this, true, true));
@@ -46,16 +47,16 @@ int StreamSocketContext::AsyncSendPacket(Packet* packet)
 {
     if (packet == NULL) return -1;
     packet_queue_->Push(packet);
+    communicate_loop_->SetEvent(this, true, true);
     return 0;
 }
 
 int StreamSocketContext::HandleOutput()
 {
-    printf("HandleOutput()\n");
     Packet* packet = packet_queue_->Pop();
     uint32_t channel_id = htonl(packet->channel_id());
     uint32_t data_length = htonl(packet->data_length());
-    printf("channel_id:%d, data_length:%d\n", channel_id, packet->data_length());
+    printf("sending channel_id:%d, data_length:%d\n", channel_id, packet->data_length());
     char* data = packet->data();
     uint32_t total_length = sizeof(channel_id) +
         sizeof(data_length) + packet->data_length();
@@ -111,6 +112,7 @@ int StreamSocketContext::HandleInput()
     Packet* packet = new Packet(channel_id);
     packet->set_packet(recv_buffer_ + sizeof(channel_id) +
             sizeof(data_length), data_length);
+    packet->set_end_point(end_point_);
     if (received_length == 0) {
         printf("disconnected\n");
         return -1;

@@ -9,6 +9,7 @@
 class ListenHandler: public NetHandler
 {
     public:
+        int OnReceived(Packet* packet, EndPoint* end_point);
         int OnReceived(Packet* packet);
         int OnAccepted(int fd);
         int OnSent(Packet* packet);

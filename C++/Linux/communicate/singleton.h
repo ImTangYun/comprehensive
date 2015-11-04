@@ -17,7 +17,18 @@ class Singleton
         static T* instance_;
         static CthreadMutex* cthread_mutex_;
 
-
+        class Freer
+        {
+            public:
+                ~Freer()
+                {
+                    if (instance_) {
+                        delete instance_;
+                        instance_ = NULL;
+                    }
+                }
+        };
+        static Freer freer_;
 };
 
 template<typename T>

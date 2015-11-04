@@ -12,6 +12,7 @@
 #include "listen_socket_context.h"
 #include "communicate_loop.h"
 #include "listen_handler.h"
+#include "end_point.h"
 int ListenSocketContext::Init()
 {
     struct sockaddr_in servaddr; 
@@ -61,26 +62,13 @@ int ListenSocketContext::HandleInput()
     char ip_port[30];
     snprintf(ip_port, 30, "%s:%d", ip, port);
     
-    SocketContext* socket_context = new
+    StreamSocketContext* socket_context = new
         StreamSocketContext(ip_port, communicate_loop_, net_handler_);
+    EndPoint* end_point = new EndPoint(socket_context);
+    socket_context->set_end_point(end_point);
     socket_context->ParseIpPort();
     socket_context->set_fd(connfd);
     net_handler_->OnAccepted(connfd);
     communicate_loop_->AddEvent(socket_context, true, false);
     return 0;
 }
-void ListenSocketContext::SetNonblocking(int sock)
-{
-    int opts;
-    opts = fcntl(sock, F_GETFL);
-    if (opts < 0) {
-        perror("set nonblocking\n");
-        exit(1);
-    }
-    opts = opts | O_NONBLOCK;
-    if (fcntl(sock, F_SETFL, opts) < 0) {
-        perror("set nonblocking2\n");
-        exit(1);
-    }
-}
-
