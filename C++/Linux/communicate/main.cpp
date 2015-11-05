@@ -6,9 +6,19 @@
 #include "communicate_loop.h"
 #include "net_handler.h"
 #include "listen_handler.h"
+#include "simple_list.h"
+
+void test_simple_list()
+{
+    SimpleList<int> slist;
+    for (int i = 0; i < 10; ++i) {
+        slist.push_back(i);
+    }
+}
 
 int main()
 {
+    test_simple_list();
     NetMachine net_machine;
     Packet* packet = new Packet();
     char* data = new char[100];

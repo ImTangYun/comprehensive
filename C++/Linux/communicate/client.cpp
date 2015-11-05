@@ -10,7 +10,7 @@
 #include "end_point.h"
 #include "singleton.h"
 
-int main()
+int client()
 {
     NetMachine* net_machine = Singleton<NetMachine>::Instance();
     Packet* packet = new Packet();
@@ -30,6 +30,12 @@ int main()
 
     net_machine->AsyncSendPacket(end_point, packet, net_handler);
     // net_machine.AsyncSendPacket("127.0.0.1:1235", packet, net_handler);
-    sleep(10);
+    sleep(3);
+    return 0;
+}
+int main()
+{
+    client();
+    delete Singleton<NetMachine>::Instance();
     return 0;
 }

@@ -14,6 +14,11 @@ class Packet
     public:
         Packet():channel_id_(Singleton<Channel>::Instance()->max_id()) {}
         Packet(uint32_t channel_id):channel_id_(channel_id) {}
+        ~Packet()
+        {
+            delete [] data_;
+            data_ = NULL;
+        }
         void set_packet(char* data, uint32_t data_length)
         { 
             data_ = data; 

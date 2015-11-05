@@ -14,7 +14,6 @@ void CommunicateLoop::Run(CThread* cthread, void* args)
 void CommunicateLoop::Process(int thread_id)
 {
     while (is_run_) {
-        // printf("thread: %d\n", thread_id);
         usleep(10);
         HandleEvent();
     }
@@ -52,7 +51,7 @@ void CommunicateLoop::HandleEvent()
             // forign connection is closed, release it;
             if (ret == -1) {
                 ClearEvent(socket_context);
-                socket_context_list_.remove(socket_context);
+                context_list_.remove_node(socket_context->node());
                 delete socket_context;
             }
         } else if (events[i].events & EPOLLOUT) {
@@ -73,7 +72,8 @@ int CommunicateLoop::AddEvent(SocketContext* socket_context,
         ev.events |= EPOLLIN;
     if (writable)
         ev.events |= EPOLLOUT;
-    socket_context_list_.push_back(socket_context);
+    Node<SocketContext*>* node = context_list_.push_back(socket_context);
+    socket_context->set_node(node);
     return epoll_ctl(efd_, EPOLL_CTL_ADD, socket_context->fd(), &ev);
 }
 
@@ -86,7 +86,6 @@ int CommunicateLoop::SetEvent(SocketContext* socket_context, bool writable, bool
         ev.events |= EPOLLIN;
     if (writable)
         ev.events |= EPOLLOUT;
-    socket_context_list_.push_back(socket_context);
     return epoll_ctl(efd_, EPOLL_CTL_MOD, socket_context->fd(), &ev);
 }
 

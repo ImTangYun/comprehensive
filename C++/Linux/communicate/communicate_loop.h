@@ -4,10 +4,9 @@
 #ifndef COMMUNICATE_LOOP
 #define COMMUNICATE_LOOP
 #include <sys/epoll.h>
-#include <list>
 #include "cthread.h"
 #include "socket_context.h"
-using std::list;
+#include "simple_list.h"
 using namespace cthread;
 class CommunicateLoop: public Runnuble
 {
@@ -29,20 +28,29 @@ class CommunicateLoop: public Runnuble
             Stop();
             delete event_loop_thread_;
             event_loop_thread_ = NULL;
-
-            for (list<SocketContext*>::iterator iter = socket_context_list_.begin();
-                    iter != socket_context_list_.end(); ++iter) {
-                delete *iter;
-                *iter = NULL;
-            }
+            IteratorFun<SocketContext*>* fun = new IteratorDel(this);
+            context_list_.HandleEveryNode(fun);
+            delete fun;
         }
         int efd() {return efd_;}
     private:
-        list<SocketContext*> socket_context_list_;
+        SimpleList<SocketContext*> context_list_;
         bool is_run_;
         CThread *event_loop_thread_;
         int efd_;
-
+        class IteratorDel: public IteratorFun<SocketContext*>
+        {
+                CommunicateLoop* communicate_loop_;
+            public:
+                IteratorDel(CommunicateLoop* communicate_loop):communicate_loop_(communicate_loop) {}
+                virtual void action(Node<SocketContext*>* node)
+                {
+                    printf("deleting socket_context\n");
+                    epoll_ctl(communicate_loop_->efd(), EPOLL_CTL_DEL, node->data_->fd(), NULL);
+                    delete node->data_;
+                    node->data_ = NULL;
+                }
+        };
 };
 
 #endif

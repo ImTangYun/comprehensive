@@ -67,6 +67,7 @@ int StreamSocketContext::HandleOutput()
     buff_int[1] = data_length;
     char* buff_data = buff + sizeof(channel_id) + sizeof(data_length);
     memcpy(buff_data, data, packet->data_length());
+    delete packet;
     Send(buff, total_length);
     delete [] buff;
     return 0;
@@ -93,25 +94,22 @@ int StreamSocketContext::HandleInput()
 {
     int received_length = 0;
     while (true) {
-        // sleep(1);
         int ret = recv(fd_, recv_buffer_ + received_length,
                 recv_buffer_length_ - received_length, 0);
-        // printf("receiving.... buf len: %d, ret: %d fd_:%d\n",
-        //        recv_buffer_length_, ret, fd_);
         if (ret <= 0) {
             break;
         }
         received_length += ret;
         AdjustBuffer(received_length);
     }
-    recv_buffer_[received_length]= '\0';
-    // printf("received: %s, length:%d\n", recv_buffer_, received_length);
     uint32_t* head = reinterpret_cast<uint32_t*>(recv_buffer_);
     uint32_t channel_id = ntohl(head[0]);
     uint32_t data_length = ntohl(head[1]);
+    char* data = new char[received_length + 1];
+    memcpy(data, recv_buffer_ + sizeof(channel_id) +
+            sizeof(data_length), received_length);
     Packet* packet = new Packet(channel_id);
-    packet->set_packet(recv_buffer_ + sizeof(channel_id) +
-            sizeof(data_length), data_length);
+    packet->set_packet(data, data_length);
     packet->set_end_point(end_point_);
     if (received_length == 0) {
         printf("disconnected\n");
