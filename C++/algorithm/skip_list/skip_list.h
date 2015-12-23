@@ -214,7 +214,7 @@ namespace lab{
             return generate_random_level((max + min) / 2, min);*/
             int32_t i = min;
             while (i < max) {
-                if (!(rand() % 3)) return i;
+                if (!(rand() % 2)) return i;
                 ++i;
             }
             return max;
@@ -301,7 +301,6 @@ namespace lab{
                 return true;
             }
             int32_t level = generate_random_level(MAX_LEVEL - 1);
-            // printf("level %d\n", level);
             IndexNode<K, V>* tmp = NULL;
             int32_t i = level;
 
@@ -322,7 +321,7 @@ namespace lab{
             if (i < 0) {
                 tmp->value_ = new V(value);
                 // every level is the first node expect the level 0
-            } else if (i == 0) {
+            } else if (i == 0 && level != 0) {
                 IndexNode<K, V>* iter = head_;
                 while (iter->next_ != tail_ && iter->next_->key_ < key) {
                     iter = iter->next_;
@@ -376,20 +375,6 @@ namespace lab{
                     }
                 }
                 tmp1->value_ = new V(value);
-                /*for (; i >= 0; --i) {
-                  IndexNode<K, V>* iter = head_ + i;
-                  while (iter->next_ != tail_ + i && iter->key_ < key) {
-                  iter = iter->next_;
-                  }
-                  IndexNode<K, V>* node = new IndexNode<K, V>();
-                  node->key_ = key;
-                  insert_after(iter, node);
-                  if (tmp) {
-                  tmp->down_ = node;
-                  }
-                  tmp = node;
-                  }
-                  tmp->value_ = new V(value);*/
             }
             max_level_ = level > max_level_?level:max_level_;
             ++size_;

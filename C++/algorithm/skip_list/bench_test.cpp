@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <vector>
+#include <map>
 #include "skip_list.h"
 
 using namespace std;
@@ -47,6 +48,8 @@ class TimeCounter
 
 void ordered_insert(int32_t* keys, int32_t length,
         skip_list<int32_t, int32_t> &t_sk_list);
+void map_insert(int32_t* keys, int32_t length,
+        map<int32_t, int32_t> &map_);
 void disordered_insert();
 
 void ordered_remove();
@@ -54,8 +57,8 @@ void disordered_remove();
 
 void find();
 
-#define BENCH_SIZE (100000)
-
+#define BENCH_SIZE (1000000)
+// #define SKIP_LIST_TEST
 int main()
 {
     int32_t* keys = new int32_t[BENCH_SIZE];
@@ -63,10 +66,17 @@ int main()
     for (; i < BENCH_SIZE; ++i) {
         keys[i] = i;
     }
-    skip_list<int32_t, int32_t> t_sk_list;
     TimeCounter time_counter;
     printf("begining\n");
+#ifdef SKIP_LIST_TEST
+    printf("skip_list test\n");
+    skip_list<int32_t, int32_t> t_sk_list;
     ordered_insert(keys, BENCH_SIZE, t_sk_list);
+#else
+    printf("map test\n");
+    map<int32_t, int32_t> map_;
+    map_insert(keys, BENCH_SIZE, map_);
+#endif
     time_counter.AddNow();
     printf("ordered insert %d para cost %.02fms\n",
             BENCH_SIZE, time_counter.GetTimeCosts(1));
@@ -80,5 +90,12 @@ void ordered_insert(int32_t* keys, int32_t length,
 {
     for (int32_t i = 0; i < length; ++i) {
         t_sk_list.add(keys[i], 0);
+    }
+}
+void map_insert(int32_t* keys, int32_t length,
+        map<int32_t, int32_t> &map_)
+{
+    for (int32_t i = 0; i < length; ++i) {
+        map_[keys[i]] = 0;
     }
 }
