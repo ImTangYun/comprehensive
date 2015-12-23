@@ -16,7 +16,7 @@
 #endif
 namespace lab{
 
-#define MAX_LEVEL 10
+#define MAX_LEVEL 16
 
     template<typename K, typename V>
         struct IndexNode
@@ -115,9 +115,10 @@ namespace lab{
                 V last();
                 int32_t size();
                 void dump();
-            private:
                 int32_t generate_random_level(int32_t max, int32_t min = 0);
-                void insert_node(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert);
+            private:
+                void insert_after(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert);
+                void insert_before(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert);
                 IndexNode<K, V>* remove_node(IndexNode<K, V>* node);
                 IndexNode<K, V>* search_first_node(K key);
 
@@ -126,6 +127,7 @@ namespace lab{
                 IndexNode<K, V>* head_;
                 IndexNode<K, V>* tail_;
                 int32_t max_level_;
+                int32_t rand_count_;
         };
     template<typename K, typename V>
         void skip_list<K, V>::dump()
@@ -134,14 +136,14 @@ namespace lab{
                 IndexNode<K, V>* iter = (head_ + i)->next_;
                 printf("head[%d]<->", i);
                 while (iter != tail_ + i) {
-                    printf("%d(%p)<->", iter->key_, iter->value_);
+                    printf("%d(%p)<->", iter->key_, iter->down_);
                     iter = iter->next_;
                 }
                 printf("tail[%d]\n", i);
             }
         }
     template<typename K, typename V>
-        skip_list<K, V>::skip_list():max_level_(0), size_(0)
+        skip_list<K, V>::skip_list():max_level_(0), size_(0), rand_count_(0)
     {
 #ifndef _WIN32
         struct timeval tpstart;
@@ -200,17 +202,38 @@ namespace lab{
     template<typename K, typename V>
         int32_t skip_list<K, V>::generate_random_level(int32_t max, int32_t min)
         {
-            if (max == min) return max;
-            if (rand() % 2) return generate_random_level(max, (max + min) / 2 + 1);
-            return generate_random_level((max + min) / 2, min);
+            /*if (max == min) return max;
+            if (rand_count_ > 100) {
+                struct timeval tpstart;
+                gettimeofday(&tpstart,NULL);
+                srand(tpstart.tv_usec);
+                rand_count_ = 0;
+            }
+            ++rand_count_;
+            if (!(rand() % 13)) return generate_random_level(max, (max + min) / 2 + 1);
+            return generate_random_level((max + min) / 2, min);*/
+            int32_t i = min;
+            while (i < max) {
+                if (!(rand() % 3)) return i;
+                ++i;
+            }
+            return max;
         }
     template<typename K, typename V>
-        inline void skip_list<K, V>::insert_node(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert)
+        inline void skip_list<K, V>::insert_after(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert)
         {
             to_insert->pre_ = pos;
             to_insert->next_ = pos->next_;
             pos->next_->pre_ = to_insert;
             pos->next_ = to_insert;
+        }
+    template<typename K, typename V>
+        inline void skip_list<K, V>::insert_before(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert)
+        {
+            to_insert->next_ = pos;
+            to_insert->pre_ = pos->pre_;
+            pos->pre_->next_ = to_insert;
+            pos->pre_ = to_insert;
         }
     template<typename K, typename V>
         inline bool skip_list<K, V>::contains(K key)
@@ -221,6 +244,7 @@ namespace lab{
         IndexNode<K, V>* skip_list<K, V>::search_first_node(K key)
         {
             if (size_ == 0) return tail_;
+            if (key < head_->next_->key_ || key > tail_->pre_->key_) return tail_;
             int32_t level = max_level_;
             IndexNode<K, V>* tmp = (head_ + level)->next_;
             while (level >= 0) {
@@ -263,7 +287,7 @@ namespace lab{
                 tmp = tmp->down_;
             }
             return tmp;
-       }
+        }
     template<typename K, typename V>
         bool skip_list<K, V>::add(K key, V value)
         {
@@ -277,15 +301,15 @@ namespace lab{
                 return true;
             }
             int32_t level = generate_random_level(MAX_LEVEL - 1);
+            // printf("level %d\n", level);
             IndexNode<K, V>* tmp = NULL;
-            max_level_ = level > max_level_?level:max_level_;
             int32_t i = level;
 
             // first node in these levels
             for (; i >= 0 && head_[i].next_ == tail_ + i; --i) {
                 IndexNode<K, V>* node = new IndexNode<K, V>();
                 node->key_ = key;
-                insert_node(head_ + i, node);
+                insert_after(head_ + i, node);
                 if (tmp == NULL) {
                     tmp = node;
                     continue;
@@ -306,26 +330,68 @@ namespace lab{
                 IndexNode<K, V>* node = new IndexNode<K, V>();
                 node->value_ = new V(value);
                 node->key_ = key;
-                insert_node(iter, node);
+                insert_after(iter, node);
                 if (tmp)
                     tmp->down_ = node;
                 // some level first and some not
             } else {
-                for (; i >= 0; --i) {
-                    IndexNode<K, V>* iter = head_ + i;
-                    while (iter->next_ != tail_ + i && iter->key_ < key) {
-                        iter = iter->next_;
+                IndexNode<K, V>* tmp1 = tmp;
+                tmp = head_[max_level_].next_;
+                int32_t tmp_level = max_level_;
+                if (tmp->key_ < key) {
+                    while (tmp_level >= 0) {
+                        while (tmp->key_ < key && tmp->next_ != tail_ + tmp_level) {
+                            tmp = tmp->next_;
+                        }
+                        if (tmp_level <= level) {
+                            IndexNode<K, V>* node = new IndexNode<K, V>();
+                            node->key_ = key;
+                            insert_after(tmp, node);
+                            if (tmp1 != NULL) {
+                                tmp1->down_ = node;
+                            }
+                            tmp1 = node;
+                        }
+                        if (tmp_level != 0)
+                            tmp = tmp->down_;
+                        --tmp_level;
                     }
-                    IndexNode<K, V>* node = new IndexNode<K, V>();
-                    node->key_ = key;
-                    insert_node(iter, node);
-                    if (tmp) {
-                        tmp->down_ = node;
+                } else {
+                    while (tmp_level >= 0) {
+                        while (tmp->key_ > key && tmp->pre_ != head_ + tmp_level) {
+                            tmp = tmp->pre_;
+                        }
+                        if (tmp_level <= level) {
+                            IndexNode<K, V>* node = new IndexNode<K, V>();
+                            node->key_ = key;
+                            insert_before(tmp, node);
+                            if (tmp1 != NULL) {
+                                tmp1->down_ = node;
+                            }
+                            tmp1 = node;
+                        }
+                        if (tmp_level != 0)
+                            tmp = tmp->down_;
+                        --tmp_level;
                     }
-                    tmp = node;
                 }
-                tmp->value_ = new V(value); 
+                tmp1->value_ = new V(value);
+                /*for (; i >= 0; --i) {
+                  IndexNode<K, V>* iter = head_ + i;
+                  while (iter->next_ != tail_ + i && iter->key_ < key) {
+                  iter = iter->next_;
+                  }
+                  IndexNode<K, V>* node = new IndexNode<K, V>();
+                  node->key_ = key;
+                  insert_after(iter, node);
+                  if (tmp) {
+                  tmp->down_ = node;
+                  }
+                  tmp = node;
+                  }
+                  tmp->value_ = new V(value);*/
             }
+            max_level_ = level > max_level_?level:max_level_;
             ++size_;
             return true;
         }

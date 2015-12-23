@@ -9,11 +9,25 @@
 using namespace std;
 using namespace lab;
 
+void rand_test(int32_t num)
+{
+    skip_list<int32_t, int32_t> sk;
+    int32_t levels[16];
+    for (int32_t i = 0; i < 16; ++i) levels[i] = 0;
+    for (int32_t i = 0; i < num; ++i) {
+        ++levels[sk.generate_random_level(MAX_LEVEL)];
+    }
+    for (int32_t i = 0; i < 16; ++i) {
+        cout << "level " << i << " times:" << levels[i] << endl;
+    }
+}
+
 int main()
 {
     skip_list<int32_t, int32_t> sl;
-    for (int32_t i = 1; i < 240; ++i) {
+    for (int32_t i = 1; i < 250; ++i) {
         sl.add(i, i);
+        // sl.dump();
     }
 
     skip_list<int32_t, int32_t>::iterator iter = sl.begin();
@@ -46,6 +60,7 @@ int main()
     size = sl.size();
     iter = sl.find(100);
     cout << "size: " << size << ",value of key 100 is " << *(iter->value_) << endl;
+    rand_test(100000);
     return 0;
 }
 
