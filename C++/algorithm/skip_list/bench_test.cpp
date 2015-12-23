@@ -22,11 +22,11 @@ class TimeCounter
         {
             gettimeofday(&starttime_,0);
         }
-        double GetTimeCosts(int num)
+        double GetTimeCosts(int32_t num)
         {
             if (num >= times_.size() && times_.size() > 0) {
                 num = times_.size();
-            } else {
+            } else if (num < 0) {
                 return 0;
             }
             return times_[num - 1];
@@ -50,15 +50,20 @@ void ordered_insert(int32_t* keys, int32_t length,
         skip_list<int32_t, int32_t> &t_sk_list);
 void map_insert(int32_t* keys, int32_t length,
         map<int32_t, int32_t> &map_);
-void disordered_insert();
 
-void ordered_remove();
-void disordered_remove();
+void ordered_remove(int32_t* keys, int32_t length,
+        skip_list<int32_t, int32_t> &t_sk_list);
+void map_remove(int32_t* keys, int32_t length,
+        map<int32_t, int32_t> &map_);
 
-void find();
+void find(int32_t* keys, int32_t length,
+        skip_list<int32_t, int32_t> &t_sk_list);
+void map_find(int32_t* keys, int32_t length,
+        map<int32_t, int32_t> &map_);
 
 #define BENCH_SIZE (1000000)
-// #define SKIP_LIST_TEST
+#define SKIP_LIST_TEST
+#define TEST_TYPE 0 // 0 insert，1 remove， 2 find
 int main()
 {
     int32_t* keys = new int32_t[BENCH_SIZE];
@@ -72,14 +77,36 @@ int main()
     printf("skip_list test\n");
     skip_list<int32_t, int32_t> t_sk_list;
     ordered_insert(keys, BENCH_SIZE, t_sk_list);
+    time_counter.AddNow();
+    printf("ordered insert %d para cost %.02fms\n",
+            BENCH_SIZE, time_counter.GetTimeCosts(1));
+    printf("finding\n");
+    find(keys, BENCH_SIZE, t_sk_list);
+    time_counter.AddNow();
+    printf("ordered find %d para cost %.02fms\n",
+            BENCH_SIZE, (time_counter.GetTimeCosts(2) - time_counter.GetTimeCosts(1)));
+    ordered_remove(keys, BENCH_SIZE, t_sk_list);
+    time_counter.AddNow();
+    printf("ordered remove %d para cost %.02fms\n",
+            BENCH_SIZE, (time_counter.GetTimeCosts(3) - time_counter.GetTimeCosts(2)));
 #else
     printf("map test\n");
     map<int32_t, int32_t> map_;
     map_insert(keys, BENCH_SIZE, map_);
-#endif
     time_counter.AddNow();
     printf("ordered insert %d para cost %.02fms\n",
             BENCH_SIZE, time_counter.GetTimeCosts(1));
+    printf("finding\n");
+    map_find(keys, BENCH_SIZE, map_);
+    time_counter.AddNow();
+    printf("ordered find %d para cost %.02fms\n",
+            BENCH_SIZE, (time_counter.GetTimeCosts(2) - time_counter.GetTimeCosts(1)));
+    map_remove(keys, BENCH_SIZE, map_);
+    time_counter.AddNow();
+    printf("ordered remove %d para cost %.02fms\n",
+            BENCH_SIZE, (time_counter.GetTimeCosts(3) - time_counter.GetTimeCosts(2)));
+#
+#endif
 
     return 0;
 }
@@ -97,5 +124,34 @@ void map_insert(int32_t* keys, int32_t length,
 {
     for (int32_t i = 0; i < length; ++i) {
         map_[keys[i]] = 0;
+    }
+}
+void find(int32_t* keys, int32_t length,
+        skip_list<int32_t, int32_t> &t_sk_list)
+{
+    for (int32_t i = 0; i < length; ++i) {
+        t_sk_list.find(keys[i]);
+    }
+}
+void map_find(int32_t* keys, int32_t length,
+        map<int32_t, int32_t> &map_)
+{
+    for (int32_t i = 0; i < length; ++i) {
+        map_.find(keys[i]);
+    }
+}
+void ordered_remove(int32_t* keys, int32_t length,
+        skip_list<int32_t, int32_t> &t_sk_list)
+{
+    for (int32_t i = 0; i < length; ++i) {
+        t_sk_list.remove(keys[i]);
+    }
+}
+void map_remove(int32_t* keys, int32_t length,
+        map<int32_t, int32_t> &map_)
+{
+    for (int32_t i = 0; i < length; ++i) {
+        auto iter = map_.find(keys[i]);
+        map_.erase(iter);
     }
 }

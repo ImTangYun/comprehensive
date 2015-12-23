@@ -116,6 +116,7 @@ namespace lab{
                 int32_t size();
                 void dump();
                 int32_t generate_random_level(int32_t max, int32_t min = 0);
+                void clear();
             private:
                 void insert_after(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert);
                 void insert_before(IndexNode<K, V>* pos, IndexNode<K, V>* to_insert);
@@ -170,12 +171,30 @@ namespace lab{
                     (node >= tail_ && node < tail_ + MAX_LEVEL)) {
                 return tail_;
             }
+            if ((node->pre_ >= head_ && node->pre_ < head_ + MAX_LEVEL) &&
+                    (node->next_ >= tail_ && node->next_ < tail_ + MAX_LEVEL)) {
+                --max_level_;
+            }
             delete node->value_;
             IndexNode<K, V>* tmp = node->next_;
             node->pre_->next_ = node->next_;
             node->next_->pre_ = node->pre_;
             delete node;
             return tmp;
+        }
+    template<typename K, typename V>
+        inline void skip_list<K, V>::clear()
+        {
+            int32_t level = max_level_;
+            while (level >= 0) {
+                IndexNode<K, V>* tmp = (head_ + level)->next_;
+                while (tmp != tail_ + level) {
+                    tmp = remove_node(tmp);
+                }
+                --level;
+            }
+            max_level_ = 0;
+            size_ = 0;
         }
     template<typename K, typename V>
         skip_list<K, V>::~skip_list()
@@ -188,6 +207,8 @@ namespace lab{
                 }
                 --level;
             }
+            delete [] head_;
+            delete [] tail_;
         }
     template<typename K, typename V>
         inline IndexNode<K, V>* skip_list<K, V>::begin()
@@ -276,6 +297,7 @@ namespace lab{
                 remove_node(tmp);
                 tmp = tmp1;
             }
+            --size_;
             return true;
         }
     template<typename K, typename V>
