@@ -1,4 +1,4 @@
-
+#Usage:
 erlc *.erl  
 erl  
 1>Pid = spawn(fun demo_spawn:loop/0).  
