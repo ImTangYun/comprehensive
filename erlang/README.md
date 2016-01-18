@@ -1,6 +1,3 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="Content-Style-Type" content="text/css" />
@@ -613,19 +610,6 @@ ok
 					
 											<li><a href="http://learnyousomeerlang.com/building-applications-with-otp" title="Next chapter">Next &gt;</a></li>
 									</ul>
-			</div><!-- content -->
-			<div id="footer">
-				<a href="http://creativecommons.org/licenses/by-nc-nd/3.0/" title="Creative Commons License Details"><img src="http://learnyousomeerlang.com/static/img/cc.png" width="88" height="31" alt="Creative Commons Attribution Non-Commercial No Derivative License" /></a>
-				<p>Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution Non-Commercial No Derivative License</p>
-			</div> <!-- footer -->
-		</div> <!-- wrapper -->
-		<div id="grass" />
-	<script type="text/javascript" src="http://learnyousomeerlang.com/static/js/shCore.js"></script>
-	<script type="text/javascript" src="http://learnyousomeerlang.com/static/js/shBrushErlang2.js?11"></script>
-	<script type="text/javascript">
-		SyntaxHighlighter.defaults.gutter = false;
-		SyntaxHighlighter.all();
-	</script>
-	</body>
+
 </html>
 
