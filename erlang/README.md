@@ -14,7 +14,7 @@
 		<link rel="apple-touch-icon" href="http://learnyousomeerlang.com/static/img/touch-icon-iphone.png" />
 		<link rel="apple-touch-icon" sizes="72x72" href="http://learnyousomeerlang.com/static/img/touch-icon-ipad.png" />
 		<link rel="apple-touch-icon" sizes="114x114" href="http://learnyousomeerlang.com/static/img/touch-icon-iphone4.png" />
-		<title>Who Supervises The Supervisors? | Learn You Some Erlang for Great Good!</title>
+		<title>Who Supervises The Supervisors? | copy from Learn You Some Erlang for Great Good!</title>
 	</head>
 	<body>
 		<div id="wrapper">
@@ -604,15 +604,3 @@ ok
 </div>
 
 <p>That's about it for the supervision strategies and child specification. Right now you might be having doubts on 'how the hell am I going to get a working application out of that?' and if that's the case, you'll be happy to get to the next chapter, which actually builds a simple application with a short supervision tree, to see how it could be done in the real world.</p>
-				<ul class="navigation">
-											<li><a href="http://learnyousomeerlang.com/event-handlers" title="Previous chapter">&lt; Previous</a></li>
-										
-					<li><a href="http://learnyousomeerlang.com/contents" title="Index">Index</a></li>
-					
-											<li><a href="http://learnyousomeerlang.com/building-applications-with-otp" title="Next chapter">Next &gt;</a></li>
-									</ul>
-			</div><!-- content -->
-			<div id="footer">
-				<a href="http://creativecommons.org/licenses/by-nc-nd/3.0/" title="Creative Commons License Details"><img src="http://learnyousomeerlang.com/static/img/cc.png" width="88" height="31" alt="Creative Commons Attribution Non-Commercial No Derivative License" /></a>
-				<p>Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution Non-Commercial No Derivative License</p>
-			</div> <!-- footer -->
