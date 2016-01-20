@@ -1,0 +1,2 @@
+-define(PRINT(Msg),io:format("~w ~w ~w:" ++ Msg ++ "~n",[self(),?MODULE,?LINE])).
+-define(PRINT(Format,Msg),io:format("~w,~w ~w:" ++ Format ++ "~n",[self(),?MODULE,?LINE] ++ Msg)).
